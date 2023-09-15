@@ -17,8 +17,6 @@ async def read_user_by_id(user: User = Depends(auth_service.get_current_user)):
 
 
 @router.post("/files/")
-async def create_file(file: UploadFile = File(),
+async def create_file(files: list[UploadFile],
                       _: User = Depends(auth_service.get_current_user)):
-    return {"file_size": file.size,
-            "file_name": file.filename,
-            "file": file.file}
+    return {"file_name": [file.filename for file in files]}
