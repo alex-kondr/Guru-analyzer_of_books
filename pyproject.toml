@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "Guru-analyzer_of_books"
+version = "0.1.0"
+description = ""
+authors = ["Alex-Kondr <alex_kondr@outlook.com>", "Mykola-Gryshyn <my.gryshyn@gmail.com>", "Vadym-Boyko <m.vadym.boyko@gmail.com>", "Yuri <yuriy.plks@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+fastapi = "^0.95.1"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+alembic = "^1.10.4"
+sqlalchemy = "^2.0.12"
+psycopg2-binary = "^2.9.6"
+pydantic = {extras = ["dotenv", "email"], version = "^1.10.7"}
+python-multipart = "^0.0.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest-mock = "^3.10.0"
+pytest-cov = "^4.0.0"
+sphinx = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
