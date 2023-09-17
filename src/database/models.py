@@ -24,4 +24,18 @@ class Document(Base):
     __tablename__ = 'documents'
     id = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    document_id = Column(Integer, nullable=False, unique=True, index=True)
+    name = Column(String, nullable=False)
+    vector_db_name = Column(String, nullable=False, unique=True, index=True)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+
+class ChatHistory(Base):
+    __tablename__ = 'chathistory'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    document_id = Column(ForeignKey('documents.id', ondelete='CASCADE'), nullable=False)
+    question = Column(String, nullable=False)
+    answer = Column(String, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
