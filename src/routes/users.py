@@ -14,9 +14,3 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/me", response_model=UserDb)
 async def read_user_by_id(user: User = Depends(auth_service.get_current_user)):
     return user
-
-
-@router.post("/files/")
-async def create_file(files: list[UploadFile],
-                      _: User = Depends(auth_service.get_current_user)):
-    return {"file_name": [file.filename for file in files]}

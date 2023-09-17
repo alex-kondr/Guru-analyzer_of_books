@@ -6,16 +6,20 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.staticfiles import StaticFiles
+
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from src.database.db import get_db
-from src.routes import auth, users
+from src.routes import auth, users, chats, files
 
 
 app = FastAPI()
 templates = Jinja2Templates(directory='templates')
 BASE_DIR = pathlib.Path(__file__).parent
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +44,8 @@ def healthchecker(db: Session = Depends(get_db)):
 
 app.include_router(auth.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
+app.include_router(files.router, prefix='/api')
+app.include_router(chats.router, prefix='/api')
 
 
 if __name__ == '__main__':
