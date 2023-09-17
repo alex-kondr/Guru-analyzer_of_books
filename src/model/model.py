@@ -1,6 +1,5 @@
-import io
-import os
 from pathlib import Path
+from typing import Union
 
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -8,23 +7,14 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import SKLearnVectorStore
 from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
-from PyPDF2 import PdfReader, PdfWriter
 
 
 EMBEDDINGS = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
-WORK_PATH = Path(__file__).parent / "vector_db"
-WORK_PATH.mkdir(exist_ok=True)
-VECTOR_DB_PATH = WORK_PATH / "document_vector_db.parquet"
 
 
-async def save_pdf_file(file:  bytes, user_id: int) -> None:
-    temp_file = WORK_PATH / f"{user_id}_temp.pdf"
-    pdf_doc = PdfReader(stream=io.BytesIO(initial_bytes=file))
-    writer = PdfWriter()
-    [writer.add_page(page) for page in pdf_doc.pages]
-    with open(temp_file, "wb") as fh:
-        writer.write(fh)
-    loader = PyPDFLoader(str(temp_file))
+async def convert_pdf_to_vector_db(file_path:  Union[str, Path], vector_db: Union[str, Path]) -> None:
+    
+    loader = PyPDFLoader(str(file_path))
     pages = loader.load_and_split()
 
     text_splitter = RecursiveCharacterTextSplitter(
@@ -40,23 +30,24 @@ async def save_pdf_file(file:  bytes, user_id: int) -> None:
     vector_db = SKLearnVectorStore.from_documents(
         texts,
         embedding=EMBEDDINGS,
-        persist_path=f"{VECTOR_DB_PATH}_{user_id}",
+        persist_path=str(vector_db),
         serializer="parquet"
     )
     # persist the store
     vector_db.persist()
-    os.remove(temp_file)
 
 
-async def load_vector_db(user_id: int):
+async def load_vector_db(vector_db_path: str):
     return SKLearnVectorStore(
         embedding=EMBEDDINGS,
-        persist_path=f"{VECTOR_DB_PATH}_{user_id}",
+        persist_path=vector_db_path,
         serializer="parquet"
     )
 
 
-async def answer_generate(question: str, vector_db):
+async def answer_generate(vector_db_path: str, question: str):
+    vector_db = await load_vector_db(vector_db_path)
+
     llm = HuggingFaceHub(repo_id="tiiuae/falcon-7b-instruct",
                          model_kwargs={"temperature": 0.5,
                                        "max_length": 512,
@@ -68,6 +59,6 @@ async def answer_generate(question: str, vector_db):
                                      return_source_documents=True,
                                      verbose=False,
                                      )
-    results = qa({"query": question})
 
+    results = qa({"query": question})
     return results['result']
