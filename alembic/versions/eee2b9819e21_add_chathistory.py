@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['document_id'], ['documents.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['files.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.add_column('documents', sa.Column('name', sa.String(), nullable=False))

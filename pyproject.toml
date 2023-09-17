@@ -16,6 +16,13 @@ sqlalchemy = "^2.0.12"
 psycopg2-binary = "^2.9.6"
 pydantic = {extras = ["dotenv", "email"], version = "^1.10.7"}
 python-multipart = "^0.0.6"
+langchain = "^0.0.292"
+pypdf = "^3.16.0"
+sentence-transformers = "^2.2.2"
+torch = ">=2.0.0, !=2.0.1"
+pandas = "^2.1.0"
+pyarrow = "^13.0.0"
+pypdf2 = "^3.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest-mock = "^3.10.0"

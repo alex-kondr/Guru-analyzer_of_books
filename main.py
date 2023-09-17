@@ -10,8 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from src.database.db import get_db
-from src.routes import auth, users
-
+from src.routes import auth, users, chats, files
 
 app = FastAPI()
 templates = Jinja2Templates(directory='templates')
@@ -24,6 +23,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/api/healthchecker")
 def healthchecker(db: Session = Depends(get_db)):
@@ -40,7 +40,8 @@ def healthchecker(db: Session = Depends(get_db)):
 
 app.include_router(auth.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
-
+app.include_router(chats.router, prefix="/api")
+app.include_router(files.router, prefix="/api")
 
 if __name__ == '__main__':
     uvicorn.run('main:app', port=8000, reload=True)
