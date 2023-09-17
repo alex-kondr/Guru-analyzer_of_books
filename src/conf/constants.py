@@ -1,3 +1,5 @@
+from pathlib import Path
+
 #--> email
 EMAIL_MAX__LEN = 50
 EMAIL_MIN_LEN = 5
@@ -13,3 +15,6 @@ PASSWORD_MAX_LEN = 10
 #--> first_name
 FIRST_NAME_MIN_LEN = 3
 FIRST_NAME_MAX_LEN = 20
+
+WORK_PATH = Path("src/model/files")
+WORK_PATH.mkdir(exist_ok=True)
