@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     secret_key: str = "secret_key"
     algorithm: str = "HS256"
     huggingfacehub_api_token: str = "123"
+    openai_api_key: str = "123"
 
     class Config:
         env_file = ".env"

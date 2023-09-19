@@ -35,8 +35,7 @@ async def ask_question(document_id: int,
     if document is None:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    vector_db_path = constants.WORK_PATH / f"user_{current_user.id}" / document.vector_db_name
-    answer = await answer_generate(str(vector_db_path), question)
+    answer = await answer_generate(document_id, question)
 
     await repository_chats.save_chat(
         document_id=document_id,
