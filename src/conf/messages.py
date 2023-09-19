@@ -13,3 +13,4 @@ COULD_NOT_VALIDATE_CREDENTIALS = "Could not validate credentials"
 FORBIDDEN = "Operation forbidden"
 USER_NOT_FOUND = 'User not found'
 BAD_REQUEST = "Bad request"
+UNSUPPORTED_CONTENT_TYPE = "Unsupported file type: {}"

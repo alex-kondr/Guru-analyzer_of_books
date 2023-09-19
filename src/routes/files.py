@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, Path
+from fastapi import APIRouter, Depends, UploadFile, Path, HTTPException, status
 
 from sqlalchemy.orm import Session
 
@@ -20,8 +20,11 @@ async def get_files(db: Session = Depends(get_db), current_user: User = Depends(
 async def add_file(files: list[UploadFile],
                    db: Session = Depends(get_db),
                    current_user: User = Depends(auth_service.get_current_user)):
-    await repository_files.create_documents(files, current_user.id, db)
-    return {"result": "Files saved in db"}
+    try:
+        await repository_files.create_documents(files, current_user.id, db)
+        return {"result": "Files saved in db"}
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.delete("/{document_id}", name="Delete document")

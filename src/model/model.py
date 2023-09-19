@@ -1,20 +1,28 @@
 from pathlib import Path
 from typing import Union
 
-from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import SKLearnVectorStore
 from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
 
+from src.conf import constants
 
 EMBEDDINGS = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
 
-async def convert_pdf_to_vector_db(file_path:  Union[str, Path], vector_db: Union[str, Path]) -> None:
-    
-    loader = PyPDFLoader(str(file_path))
+async def convert_doc_to_vector_db(file_path: Union[str, Path], vector_db: Union[str, Path],
+                                   content_type: str) -> None:
+
+    if content_type == constants.FILE_CONTENT_TYPE_PDF:
+        loader = PyPDFLoader(str(file_path))
+    elif content_type == constants.FILE_CONTENT_TYPE_TEXT:
+        loader = TextLoader(str(file_path))
+    else:
+        loader = Docx2txtLoader(str(file_path))
+
     pages = loader.load_and_split()
 
     text_splitter = RecursiveCharacterTextSplitter(
@@ -47,7 +55,6 @@ async def load_vector_db(vector_db_path: str):
 
 async def answer_generate(vector_db_path: str, question: str):
     vector_db = await load_vector_db(vector_db_path)
-
     llm = HuggingFaceHub(repo_id="tiiuae/falcon-7b-instruct",
                          model_kwargs={"temperature": 0.5,
                                        "max_length": 512,

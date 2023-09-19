@@ -1,14 +1,15 @@
 import os
 from typing import Type
+import uuid
 
-from PyPDF2 import PdfReader, PdfWriter
 from sqlalchemy.orm import Session
 from fastapi import UploadFile
 
 from src.database.models import Document
 from src.schemas.files import DocumentsList
-from src.model.model import convert_pdf_to_vector_db
+from src.model.model import convert_doc_to_vector_db
 from src.conf import constants
+from src.conf import messages
 
 
 async def get_document_by_id(document_id: int, user_id: int, db: Session) -> Type[DocumentsList] | None:
@@ -28,21 +29,21 @@ async def create_documents(files: list[UploadFile], user_id: int, db: Session):
         if document:
             continue
 
-        vector_db_name = f"{file.filename}.vector_db"
+        if file.content_type not in constants.FILE_SUPPORTED_CONTENT_TYPE:
+            raise ValueError(messages.UNSUPPORTED_CONTENT_TYPE.format(file.content_type))
 
-        pdf_doc = PdfReader(stream=file.file)
-        writer = PdfWriter()
-        [writer.add_page(page) for page in pdf_doc.pages]
+        vector_db_name = f"{file.filename}.vector_db"
 
         file_path = constants.WORK_PATH / file.filename
         with open(file_path, "wb") as fh:
-            writer.write(fh)
+            fh.write(file.file.read())
 
         new_file = Document(user_id=user_id, name=file.filename, vector_db_name=vector_db_name)
         db.add(new_file)
         db.commit()
 
-        await convert_pdf_to_vector_db(file_path=file_path, vector_db=user_path / vector_db_name)
+        await convert_doc_to_vector_db(file_path=file_path, vector_db=user_path / vector_db_name,
+                                       content_type=file.content_type)
         os.remove(file_path)
 
 
