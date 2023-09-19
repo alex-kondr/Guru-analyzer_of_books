@@ -16,5 +16,11 @@ PASSWORD_MAX_LEN = 10
 FIRST_NAME_MIN_LEN = 3
 FIRST_NAME_MAX_LEN = 20
 
-WORK_PATH = Path("src/model/files")
-WORK_PATH.mkdir(exist_ok=True)
+FILE_TYPE_IS_NOT_SUPPORTED = "File type is not supported"
+FILE_SAVED = "File saved"
+
+STATIC = Path("static")
+STATIC.mkdir(exist_ok=True)
+
+VECTOR_DB_PATH = STATIC / "vector_db_path"
+VECTOR_DB_PATH.mkdir(exist_ok=True)

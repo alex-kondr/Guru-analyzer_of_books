@@ -25,7 +25,6 @@ class Document(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     name = Column(String, nullable=False)
-    vector_db_name = Column(String, nullable=False, unique=True, index=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
