@@ -10,23 +10,33 @@ from src.services.auth import auth_service
 from src.schemas.chats import ChatHistoryResponse, ChatResponse, ChatQuestion
 from src.repository import chats as repository_chats
 from src.repository import files as repository_files
-from src.model.model import answer_generate
+from src.model.model import answer_generate, chathistory_summary_generate
 
 router = APIRouter(prefix="/chats", tags=["chats"])
 
 
 @router.get("/", name="Return all chat history for document", response_model=List[ChatHistoryResponse])
 async def read_chat_by_document_id(document_id: int,
+                                   last_question_count: int = 20,
                                    db: Session = Depends(get_db),
                                    current_user: User = Depends(auth_service.get_current_user)):
-    return await repository_chats.get_chat_by_document_id(document_id, current_user.id, db)
+
+    document = await repository_files.get_document_by_id(document_id=document_id,
+                                                         user_id=current_user.id,
+                                                         db=db)
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    return await repository_chats.get_chat_by_document_id(document_id=document_id,
+                                                          user_id=current_user.id,
+                                                          last_question_count=last_question_count,
+                                                          db=db)
 
 
 @router.post("/", name="Ask a question to file", response_model=ChatResponse)
 async def ask_question(body: ChatQuestion,
                        db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
-
     document = await repository_files.get_document_by_id(document_id=body.document_id,
                                                          user_id=current_user.id,
                                                          db=db)
@@ -42,5 +52,34 @@ async def ask_question(body: ChatQuestion,
         user_id=current_user.id,
         db=db
     )
+
+    return {"answer": answer}
+
+
+@router.post("/summary/{document_id}", name="Make last answers summary", response_model=ChatResponse)
+async def make_chathistory_summary_by_document_id(document_id: int,
+                                                  last_question_count: int = None,
+                                                  sentences_count: int = 5,
+                                                  db: Session = Depends(get_db),
+                                                  current_user: User = Depends(auth_service.get_current_user)):
+
+    document = await repository_files.get_document_by_id(document_id=document_id,
+                                                         user_id=current_user.id,
+                                                         db=db)
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    chat_history = await repository_chats.get_chat_by_document_id(document_id=document_id,
+                                                                  user_id=current_user.id,
+                                                                  last_question_count=last_question_count,
+                                                                  db=db)
+
+    history_answers = [chat.answer for chat in chat_history]
+
+    answers_for_make_summary = ' '.join(history_answers)
+
+    answer = await chathistory_summary_generate(document_id=document_id,
+                                                chathistory=answers_for_make_summary,
+                                                sentences_count=sentences_count)
 
     return {"answer": answer}
