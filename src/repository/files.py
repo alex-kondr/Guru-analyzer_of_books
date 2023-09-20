@@ -19,16 +19,13 @@ async def get_document_by_name(name: str, user_id: int, db: Session) -> Document
     return db.query(Document).filter(Document.name == name, Document.user_id == user_id).first()
 
 
-async def create_documents(files: list[UploadFile], user_id: int, db: Session) -> List[Document]:
-    documents = []
+async def create_document(file: UploadFile, user_id: int, db: Session) -> Document:
 
     temp_path = constants.VECTOR_DB_PATH / "temp"
     temp_path.mkdir(exist_ok=True)
 
-    for file in files:
-        document = await get_document_by_name(file.filename, user_id, db)
-        if document:
-            continue
+    document = await get_document_by_name(file.filename, user_id, db)
+    if not document:
 
         file_path = temp_path / file.filename
         with open(file_path, "wb") as fh:
@@ -38,12 +35,11 @@ async def create_documents(files: list[UploadFile], user_id: int, db: Session) -
         db.add(document)
         db.commit()
         db.refresh(document)
-        documents.append(document)
 
         await convert_document_to_vector_db(file_path=file_path, document_id=document.id)
         os.remove(file_path)
 
-    return documents
+    return document
 
 
 async def create_document_by_url(url: str, user_id: int, db: Session) -> Document:
