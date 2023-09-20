@@ -69,7 +69,7 @@ async def get_user_documents(search_str: str, user_id: int, db: Session) -> list
     query = db.query(Document).filter(Document.user_id == user_id)
 
     if search_str:
-        search_str_fmt = "%" + search_str + "%"  # for partial search
+        search_str_fmt = "%" + search_str + "%"
         query = query.filter(Document.name.ilike(search_str_fmt))
 
     query = query.order_by(desc(Document.id))
