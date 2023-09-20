@@ -12,8 +12,9 @@ router = APIRouter(prefix="/files", tags=["files"])
 
 
 @router.get("/", name="Return all user's files")
-async def get_files(db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
-    return await repository_files.get_user_documents(current_user.id, db)
+async def get_files(search_str: str = None, db: Session = Depends(get_db),
+                    current_user: User = Depends(auth_service.get_current_user)):
+    return await repository_files.get_user_documents(search_str, current_user.id, db)
 
 
 @router.post("/doc", name="Upload file")

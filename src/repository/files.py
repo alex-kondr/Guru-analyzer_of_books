@@ -1,9 +1,8 @@
-import uuid
 import os
 import shutil
 from typing import Type
 
-from PyPDF2 import PdfReader, PdfWriter
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from fastapi import UploadFile
 
@@ -46,12 +45,17 @@ async def create_documents(files: list[UploadFile], user_id: int, db: Session):
 
 
 async def create_document_by_url(url: str, user_id: int, db: Session):
-    document = Document(user_id=user_id, name=uuid.uuid4())
-    db.add(document)
-    db.commit()
-    db.refresh(document)
+    document = await get_document_by_name(url, user_id, db)
 
-    return await convert_document_to_vector_db(file_path=url, document_id=document.id)
+    if not document:
+        document = Document(user_id=user_id, name=url)
+        db.add(document)
+        db.commit()
+        db.refresh(document)
+        await convert_document_to_vector_db(file_path=url, document_id=document.id)
+
+    return {"result": "Files saved"}
+
 
 
 async def delete_document_by_id(document_id: int, user_id: int, db: Session):
@@ -62,5 +66,13 @@ async def delete_document_by_id(document_id: int, user_id: int, db: Session):
     return {"result": "Done"}
 
 
-async def get_user_documents(user_id: int, db: Session) -> list[Type[DocumentsList]]:
-    return db.query(Document).filter(Document.user_id == user_id).all()
+async def get_user_documents(search_str: str, user_id: int, db: Session) -> list[Type[DocumentsList]]:
+    query = db.query(Document).filter(Document.user_id == user_id)
+
+    if search_str:
+        query = query.filter(Document.name.like(search_str))
+
+    query = query.order_by(desc(Document.id))
+
+    return query.all()
+
