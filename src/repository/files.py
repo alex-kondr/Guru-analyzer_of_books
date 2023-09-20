@@ -57,7 +57,6 @@ async def create_document_by_url(url: str, user_id: int, db: Session):
     return {"result": "Files saved"}
 
 
-
 async def delete_document_by_id(document_id: int, user_id: int, db: Session):
     await delete_vector_db(document_id=document_id)
     document = await get_document_by_id(document_id, user_id, db)
@@ -70,9 +69,9 @@ async def get_user_documents(search_str: str, user_id: int, db: Session) -> list
     query = db.query(Document).filter(Document.user_id == user_id)
 
     if search_str:
-        query = query.filter(Document.name.like(search_str))
+        search_str_fmt = "%" + search_str + "%"  # for partial search
+        query = query.filter(Document.name.ilike(search_str_fmt))
 
     query = query.order_by(desc(Document.id))
 
     return query.all()
-
