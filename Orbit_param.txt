@@ -1,0 +1,68 @@
+An orbit is the gravitationally curved trajectory of a celestial body. This can be seen
+as the trajectory of a planet around a star, or a natural satellite around a planet.
+Planets and satellites follow elliptic orbits, where the center of mass is orbited at a
+focal point of the ellipse [35].
+One way of defining the orbit of a satellite, is by defining it as a Kepler orbit, which
+contains the 6 Keplerian elements. These elements are listed and defined in Table
+2.1, and visualized in Figure 2.1. With the use of the 6 Keplerian elements, any
+orbit can be defined and analysed.
+Parameter Definition Symbol
+Eccentricity  Shape of the ellipse,elongation compared to a cicle e
+Semi-major axis Mean of periapsis and apoapsis distance, apoapsis being the a
+Inclination Vertical tilt of the ellipse i
+Longitude Horizontal tilt of the ellipse W
+Argument of periapsis Orientation of the ellipse w
+True anomaly Position of the orbiting body along the ellipse at a specific time, described at epoch (t0) v
+Table 2.1: Keplerian elements of an orbit
+
+Altitude
+There are different altitude classifications for an orbit. Some of these are Low
+Earth Orbit (LEO), Medium Earth Orbit (MEO), and Geostationary Orbit (GEO),
+where the orbit have an altitude below 2000km, from 2000km to 35786km, and at
+35786km to Earth respectively, shown in Figure 2.2. The orbit period is around
+100 minutes in LEO, 12 hours in MEO, and 24 hours in GEO. This means, that
+a satellite in GEO has the same angular velocity as Earth, whereas a satellite in
+LEO has an angular velocity around 14 times greater. Due to the gravitational pull
+from Earth, the closer a satellite is to Earth, the higher speed is required to stay in
+orbit. Combining this with aerial drag and solar pressure, a satellite in orbit will
+lose altitude over time. This is accounted for with a propulsion system, which is
+described in section 2.2.
+As shown in Table 2.1, the semi-major axis of an orbit describes the altitude
+with respect to the center of Earth, instead of the distance to the surface of Earth.
+For instance, if a satellite has a semi-major axis of 6928km and an eccentricity of 0,
+it is placed in a circular LEO at around 550km altitude.
+2.1.2 Attitude
+The attitude of a satellite is the orientation with respect to an inertial frame of reference,
+for instance placed at the center of Earth or nearby objects. The orientation
+of a satellite is computed by an orbit frame and a body frame. Controlling the attitude
+is an essential aspect of an satellite in orbit, due to actions requiring a certain
+attitude to work, but can also be used to optimise the effectiveness of a task [29].
+An example of this, is a satellite which antennas have to be aligned parallel to the
+surface of Earth in order to communicate with ground stations, or even tilting the
+antenna to increase the area of coverage.
+Attitude control is not in the scope of this project, and will therefore not be investigated
+further.
+2.1.3 Constellation
+When multiple satellites are working together as a system, for example to provide
+global or near-global signal coverage, the satellites can be defined as a satellite constellation.
+This is achieved by having a single or more orbital planes and ground
+stations distributed globally. For a constellation in a single orbital plane, each
+satellite will have connection to different ground stations at different times, and
+the satellites will have the same true anomaly only with a constant time lag. From
+a user’s point of view, when considering global coverage, at least 1 satellite can be
+communicated with at all times, no matter where the user is located.
+By having a constellation with a single orbital plane, specific regions can have
+permanent coverage, and by having multiple orbital planes, permanent global coverage
+can be achieved. Depending on the design of the constellation and the satellites,
+multiple orbital planes can also be utilized to cover only specific regions.
+A method of designing a constellation, is the Walker Delta Pattern, which designs
+the satellites to have similar orbits, eccentricity, and inclination. This is done,
+so that any perturbations will affect the satellites similarly, and by having circular
+orbits, the altitude is constant.
+The Walker Constellation has the notation:
+i : t/p/ f (2.1)
+where i is the inclination, t is the total number of satellites, p is the number
+of equally spaced planes, and f is the relative spacing between the satellites in
+adjacent planes. An example of this, is the Galileo Navigation System, which is a
+56:24/3/1 constellation [40]. This means that the system consists of 24 satellites
+in 3 planes, inclined at 56 degrees, as shown in Figure 2.3.
