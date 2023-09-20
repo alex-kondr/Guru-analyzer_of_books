@@ -21,11 +21,11 @@ async def get_files(search_str: str = None, db: Session = Depends(get_db), curre
 
 @router.post("/doc",
              name="Upload file. The following file types are supported: pdf, docx, doc, txt ",
-             response_model=List[Document])
-async def add_files(files: list[UploadFile],
-                    db: Session = Depends(get_db),
-                    current_user: User = Depends(auth_service.get_current_user)):
-    return await repository_files.create_documents(files, current_user.id, db)
+             response_model=Document)
+async def add_file(file: UploadFile,
+                   db: Session = Depends(get_db),
+                   current_user: User = Depends(auth_service.get_current_user)):
+    return await repository_files.create_document(file, current_user.id, db)
 
 
 @router.post("/url", name="Upload text by url", response_model=Document)
