@@ -7,13 +7,11 @@ class DocumentModel(BaseModel):
     id: int
     user_id: int
     name: str
-    vector_db_name: str
 
 
-class DocumentsList(BaseModel):
+class Document(BaseModel):
     id: int
     name: str
-    vector_db_name: str
     created_at: datetime
     updated_at: datetime
 

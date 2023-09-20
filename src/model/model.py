@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import Union, Dict
 
+from fastapi import HTTPException, status
 from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 from langchain.document_loaders import SeleniumURLLoader
@@ -19,7 +20,7 @@ from src.conf import constants
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 
 
-async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> dict:
+async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
     file_path = str(file_path)
     if file_path.lower().endswith(".pdf"):
         loader = PyPDFLoader(file_path)
@@ -47,7 +48,7 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         pages = loader.load()
 
     else:
-        return {"result": constants.FILE_TYPE_IS_NOT_SUPPORTED}
+        return HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=constants.FILE_TYPE_IS_NOT_SUPPORTED)
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1024,
@@ -61,7 +62,6 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
     # Create/update the vector store
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
-    return {"result": constants.FILE_SAVED}
 
 
 async def load_vector_db(document_id: int):

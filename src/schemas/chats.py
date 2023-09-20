@@ -26,3 +26,7 @@ class ChatHistoryResponse(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
 
+
+class ChatQuestion(BaseModel):
+    document_id: int
+    question: str

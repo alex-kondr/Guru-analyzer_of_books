@@ -6,9 +6,8 @@ from sqlalchemy.orm import Session
 
 from src.database.db import get_db
 from src.database.models import User
-from src.conf import constants
 from src.services.auth import auth_service
-from src.schemas.chats import ChatHistoryResponse, ChatResponse
+from src.schemas.chats import ChatHistoryResponse, ChatResponse, ChatQuestion
 from src.repository import chats as repository_chats
 from src.repository import files as repository_files
 from src.model.model import answer_generate
@@ -24,22 +23,21 @@ async def read_chat_by_document_id(document_id: int,
 
 
 @router.post("/", name="Ask a question to file", response_model=ChatResponse)
-async def ask_question(document_id: int,
-                       question: str,
+async def ask_question(body: ChatQuestion,
                        db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
 
-    document = await repository_files.get_document_by_id(document_id=document_id,
+    document = await repository_files.get_document_by_id(document_id=body.document_id,
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    answer = await answer_generate(document_id, question)
+    answer = await answer_generate(body.document_id, body.question)
 
     await repository_chats.save_chat(
-        document_id=document_id,
-        question=question,
+        document_id=body.document_id,
+        question=body.question,
         answer=answer,
         user_id=current_user.id,
         db=db
