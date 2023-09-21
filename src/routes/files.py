@@ -83,3 +83,15 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
     answer = await document_summary_generate(document_id, sentences_count)
 
     return {"answer": answer}
+
+
+@router.get("/last_document", name="Return last chated document", response_model=Document)
+async def get_files(db: Session = Depends(get_db),
+                    current_user: User = Depends(auth_service.get_current_user)):
+    last_document_id = await repository_files.get_last_user_document_id(user_id=current_user.id, db=db)
+    if last_document_id:
+        return await repository_files.get_document_by_id(document_id=last_document_id,
+                                                         user_id=current_user.id,
+                                                         db=db)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
