@@ -93,3 +93,21 @@ async def answer_generate(document_id: int, question: str):
 
     results = qa({"query": question})
     return results['result']
+
+
+async def document_summary_generate(document_id: int, sentences_count: int):
+
+    vector_db = await load_vector_db(document_id)
+    # TODO реалізувати формування самарі по документу
+
+    result = "--- answer will be soon --- \n" * sentences_count
+    return result
+
+
+async def chathistory_summary_generate(document_id: int, chathistory: str, sentences_count: int):
+
+    vector_db = await load_vector_db(document_id)
+    # TODO реалізувати формування самарі по chathistory
+
+    result = chathistory # + "\n" + "--- answer will be soon --- " * sentences_count
+    return result
