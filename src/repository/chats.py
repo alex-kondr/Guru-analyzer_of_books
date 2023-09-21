@@ -13,10 +13,11 @@ async def get_chat_by_document_id(document_id: int, user_id: int, last_question_
                                          ChatHistory.user_id == user_id).order_by(desc(ChatHistory.id))
 
     if last_question_count is None:
-        results = query.all()
+        chat_results = query.all()
     else:
-        results = query.limit(last_question_count).all()
+        chat_results = query.limit(last_question_count).all()
 
+    results = sorted(chat_results, key=lambda x: x.id)
     return results
 
 

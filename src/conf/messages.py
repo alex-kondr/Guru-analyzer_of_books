@@ -13,3 +13,6 @@ COULD_NOT_VALIDATE_CREDENTIALS = "Could not validate credentials"
 FORBIDDEN = "Operation forbidden"
 USER_NOT_FOUND = 'User not found'
 BAD_REQUEST = "Bad request"
+FILE_TYPE_IS_NOT_SUPPORTED = "File type is not supported"
+DOCUMENT_IS_EXIST_ALREADY = "Document '{doc_name}' has already been loaded previously"
+DOCUMENT_NOT_FOUND = "Document not found"

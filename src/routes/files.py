@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, UploadFile, Path, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, Path, HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
@@ -10,6 +10,7 @@ from src.repository import files as repository_files
 from src.schemas.files import Document
 from src.schemas.chats import ChatResponse
 from src.model.model import document_summary_generate
+from src.conf import messages
 
 router = APIRouter(prefix="/files", tags=["files"])
 
@@ -24,17 +25,32 @@ async def get_files(search_str: str = None, db: Session = Depends(get_db),
 
 @router.post("/doc",
              name="Upload file. The following file types are supported: pdf, docx, doc, txt ",
-             response_model=Document)
+             response_model=Document,
+             status_code=status.HTTP_201_CREATED)
 async def add_file(file: UploadFile,
                    db: Session = Depends(get_db),
                    current_user: User = Depends(auth_service.get_current_user)):
+    document = await repository_files.get_document_by_name(name=file.filename,
+                                                           user_id=current_user.id,
+                                                           db=db)
+    if document:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=file.filename))
+
     return await repository_files.create_document(file, current_user.id, db)
 
 
-@router.post("/url", name="Upload text by url", response_model=Document)
+@router.post("/url", name="Upload text by url", response_model=Document, status_code=status.HTTP_201_CREATED)
 async def add_text_by_url(url: str,
                           db: Session = Depends(get_db),
                           current_user: User = Depends(auth_service.get_current_user)):
+    document = await repository_files.get_document_by_name(name=url,
+                                                           user_id=current_user.id,
+                                                           db=db)
+    if document:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=url))
+
     return await repository_files.create_document_by_url(url, current_user.id, db)
 
 
@@ -47,7 +63,7 @@ async def delete_file(document_id: int = Path(ge=1),
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
     return await repository_files.delete_document_by_id(document_id, current_user.id, db)
 
@@ -62,7 +78,7 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
     answer = await document_summary_generate(document_id, sentences_count)
 
