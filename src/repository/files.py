@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from fastapi import UploadFile
 
 from src.database.models import Document
+from src.database.models import ChatHistory
 from src.model.model import convert_document_to_vector_db, delete_vector_db
 from src.conf import constants
 
@@ -73,3 +74,14 @@ async def get_user_documents(search_str: str, user_id: int, db: Session) -> List
     query = query.order_by(desc(Document.id))
 
     return query.all()
+
+
+async def get_last_user_document_id(user_id: int, db: Session) -> int | None:
+
+    last_chathistory = db.query(ChatHistory).filter(ChatHistory.user_id == user_id)\
+        .order_by(desc(ChatHistory.id)).limit(1).first()
+
+    if last_chathistory:
+        return last_chathistory.document_id
+    else:
+        return None
