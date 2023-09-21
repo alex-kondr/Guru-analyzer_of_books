@@ -15,6 +15,7 @@ from docx import Document
 
 from src.conf.config import settings
 from src.conf import constants
+from src.conf import messages
 
 
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
@@ -48,7 +49,7 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         pages = loader.load()
 
     else:
-        return HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=constants.FILE_TYPE_IS_NOT_SUPPORTED)
+        return HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=messages.FILE_TYPE_IS_NOT_SUPPORTED)
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1024,

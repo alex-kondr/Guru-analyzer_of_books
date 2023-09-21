@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from sqlalchemy.orm import Session
 
@@ -11,6 +11,7 @@ from src.schemas.chats import ChatHistoryResponse, ChatResponse, ChatQuestion
 from src.repository import chats as repository_chats
 from src.repository import files as repository_files
 from src.model.model import answer_generate, chathistory_summary_generate
+from src.conf import messages
 
 router = APIRouter(prefix="/chats", tags=["chats"])
 
@@ -25,7 +26,7 @@ async def read_chat_by_document_id(document_id: int,
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
     return await repository_chats.get_chat_by_document_id(document_id=document_id,
                                                           user_id=current_user.id,
@@ -41,7 +42,7 @@ async def ask_question(body: ChatQuestion,
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
     answer = await answer_generate(body.document_id, body.question)
 
@@ -67,7 +68,7 @@ async def make_chathistory_summary_by_document_id(document_id: int,
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
     chat_history = await repository_chats.get_chat_by_document_id(document_id=document_id,
                                                                   user_id=current_user.id,

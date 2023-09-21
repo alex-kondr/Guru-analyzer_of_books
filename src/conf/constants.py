@@ -16,9 +16,6 @@ PASSWORD_MAX_LEN = 10
 FIRST_NAME_MIN_LEN = 3
 FIRST_NAME_MAX_LEN = 20
 
-FILE_TYPE_IS_NOT_SUPPORTED = "File type is not supported"
-FILE_SAVED = "File saved"
-
 STATIC = Path("static")
 STATIC.mkdir(exist_ok=True)
 
