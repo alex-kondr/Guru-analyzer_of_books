@@ -1120,7 +1120,7 @@ files = [
 name = "jinja2"
 version = "3.1.2"
 description = "A very fast and expressive template engine."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -3119,4 +3119,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9ee7881020d68b47fc32313d6190e599e308ec419fe4ea8b12619a5bbff3249e"
+content-hash = "21f13ed673e3c3bb251eb2b64863deef67ea4ee3e32aeca4bd370985b576b4ee"
