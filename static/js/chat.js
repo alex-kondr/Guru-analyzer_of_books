@@ -17,6 +17,7 @@ resize_ob.observe(document.querySelector("#chat_box"));
 const global_mdg = document.getElementById("messages")
 const btn_submit = document.getElementById("btn_submit");
 const btn_search = document.getElementById("btn_search");
+const btn_history = document.getElementById("btn_history");
 const query = document.getElementById("msg_input");
 
 const send_glyph = document.getElementById("send_glyph");

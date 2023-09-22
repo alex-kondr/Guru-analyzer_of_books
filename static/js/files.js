@@ -99,8 +99,112 @@ async function sendFile(file) {
 
 function selectFile(file_id, file_name) {
     // const work_file = document.getElementById("work_file");
-    work_file.setAttribute("data-bs-id", String(file_id))
-    work_file.value = file_name
+    work_file.setAttribute("data-bs-id", String(file_id));
+    work_file.value = file_name;
+}
+
+btn_history.onclick = async function (e) {
+    e.preventDefault();
+    let doc_id = work_file.getAttribute("data-bs-id");
+    if (doc_id === "") {
+        const last_doc = await getLastFile();
+        doc_id = last_doc.id;
+        work_file.setAttribute("data-bs-id", last_doc.id);
+        work_file.value = last_doc.name;
+    }
+    if (doc_id !== "") {
+        const history = await getHistory(doc_id);
+        await showHistory(history);
+    }
+}
+
+async function getLastFile() {
+    const token = localStorage.getItem('accessToken');
+    let last_doc = null;
+
+    const response = await fetch("/api/files/last_document", {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    });
+
+    if (response.ok === true) {
+        last_doc = await response.json();
+    } else {
+        if (response.status === 401)
+            swal("Not authenticated");
+        else if (response.status === 404)
+            swal("You don't have a message history yet.");
+        else {
+            const error = await response.json();
+            swal(error.detail);
+        }
+    }
+
+    return last_doc;
+}
+
+async function getHistory(file_id) {
+    const url = `/api/chats/?document_id=${file_id}`
+    const token = localStorage.getItem('accessToken');
+    let history = null
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    });
+
+    if (response.ok === true) {
+        history = await response.json();
+    } else {
+        if (response.status === 401)
+            swal("Not authenticated");
+        else if (response.status === 404)
+            swal("You don't have a message history yet.");
+        else {
+            const error = await response.json();
+            swal(error.detail);
+        }
+    }
+
+    return history;
+}
+
+async function showHistory(history) {
+    if (history){
+        global_mdg.replaceChildren();
+        history.forEach(rec => createHistoryMessage(rec));
+        global_mdg.scrollTop = global_mdg.scrollHeight;
+    }
+}
+
+function createHistoryMessage(rec) {
+    const messages = [{"sender": true, "text": rec.question},
+        {"sender": false, "text": rec.answer, "date": rec.created_at}];
+    messages.forEach(msg => printMessage(msg));
+}
+
+function printMessage (msg){
+    const messageContent = document.createElement("div");
+
+    if (msg["sender"])
+        messageContent.classList.add("message-content", "message-sent");
+    else
+        messageContent.classList.add("message-content", "message-received");
+
+    messageContent.textContent = msg["text"];
+
+    const messageData = document.createElement('div');
+    messageData.classList.add('message-time');
+    messageData.textContent = msg["date"];
+
+    messageContent.appendChild(messageData);
+    global_mdg.appendChild(messageContent);
 }
 
 btn_search.onclick = async function (e) {
