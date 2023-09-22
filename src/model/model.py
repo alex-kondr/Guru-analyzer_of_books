@@ -3,9 +3,11 @@ from pathlib import Path
 from typing import Union, Dict
 
 from fastapi import HTTPException, status
+from langchain.chains.question_answering import load_qa_chain
 from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 from langchain.document_loaders import SeleniumURLLoader
+from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
@@ -77,23 +79,25 @@ async def delete_vector_db(document_id: int):
     os.remove(constants.VECTOR_DB_PATH / f"{document_id}.pkl")
 
 
-async def answer_generate(document_id: int, question: str):
+async def answer_generate(document_id: int, question: str) -> Dict:
     vector_db = await load_vector_db(document_id)
 
-    llm = HuggingFaceHub(repo_id="tiiuae/falcon-7b-instruct",
+    llm = HuggingFaceHub(repo_id="tiiuae/falcon-7b",
                          model_kwargs={"temperature": 0.5,
                                        "max_length": 512,
                                        "max_new_tokens": 200
                                        })
 
-    qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff",
-                                     retriever=vector_db.as_retriever(search_kwargs={"k": 2}),
-                                     return_source_documents=True,
-                                     verbose=False
-                                     )
+    memory = ConversationBufferMemory(memory_key="chat_history")
+    qa_chain = load_qa_chain(llm=llm, chain_type="stuff")
+
+    qa = RetrievalQA(combine_documents_chain=qa_chain,
+                     retriever=vector_db.as_retriever(),
+                     memory=memory)
 
     results = qa({"query": question})
-    return results['result']
+    return {"answer": results['result'],
+            "chat_history": results['chat_history']}
 
 
 async def document_summary_generate(document_id: int, sentences_count: int):

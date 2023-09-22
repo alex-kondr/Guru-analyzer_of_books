@@ -44,17 +44,17 @@ async def ask_question(body: ChatQuestion,
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
-    answer = await answer_generate(body.document_id, body.question)
+    result = await answer_generate(body.document_id, body.question)
 
     await repository_chats.save_chat(
         document_id=body.document_id,
         question=body.question,
-        answer=answer,
+        answer=result["answer"],
         user_id=current_user.id,
         db=db
     )
 
-    return {"answer": answer}
+    return {"answer": result["answer"]}
 
 
 @router.post("/summary/{document_id}", name="Make last answers summary", response_model=ChatResponse)
