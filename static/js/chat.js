@@ -5,9 +5,6 @@ const resize_ob = new ResizeObserver(function (entries) {
     let height = rect.height;
     
     document.querySelector("#messages").style.height = String(height - 125) + "px"
-    // const data_files_height = document.getElementById("#data_files").clientHeight;
-    // if (data_files_height > (height - 100))
-    // document.querySelector("#data_files").style.height = String(h1) + "px"
     document.querySelector("#data_files").style.height = String(height - 80) + "px"
 
     const chat_input = document.querySelector("#chat_input")
@@ -19,6 +16,7 @@ resize_ob.observe(document.querySelector("#chat_box"));
 
 const global_mdg = document.getElementById("messages")
 const btn_submit = document.getElementById("btn_submit");
+const btn_search = document.getElementById("btn_search");
 const query = document.getElementById("msg_input");
 
 const send_glyph = document.getElementById("send_glyph");
@@ -52,12 +50,12 @@ function createMessage(message_text, sender) {
 
 btn_submit.onclick = async function (e) {
     const file_id = work_file.getAttribute("data-bs-id")
+    e.preventDefault();
     if (file_id) {
         if (query.value) {
             send_glyph.style.display = "none";
             send_spin.style.display = "inline-block";
             try {
-                e.preventDefault();
                 createMessage(query.value, true)
                 await sendMessage(query.value, file_id)
                 query.value = ""
@@ -66,9 +64,14 @@ btn_submit.onclick = async function (e) {
                 send_spin.style.display = "none";
             }
         }
-        else alert("Write your message, please.")
+        else
+            swal("Write your message, please.");
     }
-    else alert("Specify wirk file, please.")
+    else {
+        swal("Specify a work file, please.");
+        const files_tab = document.getElementById("pills-files-tab");
+        files_tab.click()
+    }
 }
 
 async function sendMessage(message_text, doc_id) {
@@ -91,14 +94,15 @@ async function sendMessage(message_text, doc_id) {
         createMessage(answer.answer, false)
     } else {
         if (response.status === 401)
-            alert("Not authenticated");
+            swal("Not authenticated");
         else if (response.status === 422)
-            alert("Input data is invalid");
+            swal("Input data is invalid");
         else {
             const error = await response.json();
-            alert(error.detail);
+            swal(error.detail);
         }
     }
 }
+
 
 

@@ -29,23 +29,28 @@
   <div class="card-body" id="chat_box">
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+        <button class="nav-link active" id="pills-chat-tab" data-bs-toggle="pill"
                 data-bs-target="#pills-home" type="button" role="tab">Chat
         </button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+        <button class="nav-link" id="pills-files-tab" data-bs-toggle="pill"
                 data-bs-target="#pills-profile" type="button" role="tab">Files
         </button>
       </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill"
-                data-bs-target="#pills-contact" type="button" role="tab">History
-        </button>
-      </li>
       <li class="work-file">
+        <div class="input-group" id="work_file_group">
           <input type="text" class="form-control" value=""
                  id="work_file" data-bs-id="" placeholder="Work file" readonly>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" id="btn_history">
+              <i class="fa fa-history" id="get_history"></i>
+            </button>
+            <button class="btn btn-outline-secondary" id="btn_summary">
+              <i class="fa fa-wand-magic-sparkles" id="get_summary"></i>
+            </button>
+          </div>
+        </div>
       </li>
     </ul>
     <hr>
@@ -72,12 +77,15 @@
             <div class="col-12">
               <div class="container">
                 <nav class="navbar">
-                  <div class="d-flex justify-content-start">
-                    <input class="form-control me-2" id="filter_str" type="search"
-                           placeholder="Search" aria-label="Search" value="">
-                    <button class="btn btn-outline-success text-nowrap" onclick="getFiles()">
-                      <span class="btn-label"><i class="fa fa-refresh"></i></span> Refresh</button>
-                  </div>
+                  <form class="form-inline" id="filter-form">
+                    <div class="input-group" id="filter_input">
+                      <input type="search" class="form-control" id="filter_str" placeholder="Search">
+                      <div class="input-group-append">
+                      <button class="btn btn-outline-success text-nowrap" id="btn_search" onclick="getFiles()">
+                        <span class="btn-label"><i class="fa fa-refresh"></i></span> Refresh</button>
+                      </div>
+                    </div>
+                  </form>
                   <div class='d-flex justify-content-end'>
                     <button class="btn btn-outline-primary text-nowrap" id="btn_add_file"
                             onclick="uploadFiles()">

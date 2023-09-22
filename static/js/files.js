@@ -88,11 +88,10 @@ async function sendFile(file) {
         result =  await response.json();
     } else {
         if (response.status === 422)
-            alert("Input data is invalid");
+            swal("Input data is invalid");
         else {
-            alert("fghfghfgh");
             const error = await response.json();
-            alert(error.detail);
+            swal(error.detail);
         }
     }
     return result
@@ -104,9 +103,13 @@ function selectFile(file_id, file_name) {
     work_file.value = file_name
 }
 
-async function getFiles() {
+btn_search.onclick = async function (e) {
+    e.preventDefault();
     let filter_str = document.getElementById("filter_str").value;
+    await getFiles(filter_str)
+}
 
+async function getFiles(filter_str) {
     let url_str
     if (filter_str)
         url_str = `/api/files/?search_str=${filter_str}`
@@ -132,10 +135,10 @@ async function getFiles() {
         files.forEach(file => rows.append(newTableRow(file)));
     } else {
         if (response.status === 401)
-            alert("Not authenticated");
+            swal("Not authenticated");
         else {
             const error = await response.json();
-            alert(error.detail);
+            swal(error.detail);
         }
     }
 }
@@ -156,10 +159,10 @@ async function deleteFile(file_id) {
   }
   else {
     if (response.status === 401)
-      alert("Not authenticated");
+      swal("Not authenticated");
     else {
       const error = await response.json();
-      alert(error.detail);
+      swal(error.detail);
     }
   }
   return response.ok;
