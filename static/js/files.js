@@ -98,9 +98,9 @@ async function sendFile(file) {
 }
 
 function selectFile(file_id, file_name) {
-    // const work_file = document.getElementById("work_file");
     work_file.setAttribute("data-bs-id", String(file_id));
     work_file.value = file_name;
+    global_mdg.replaceChildren();
 }
 
 btn_history.onclick = async function (e) {
@@ -184,7 +184,7 @@ async function showHistory(history) {
 }
 
 function createHistoryMessage(rec) {
-    const messages = [{"sender": true, "text": rec.question},
+    const messages = [{"sender": true, "text": rec.question, "date": rec.created_at},
         {"sender": false, "text": rec.answer, "date": rec.created_at}];
     messages.forEach(msg => printMessage(msg));
 }

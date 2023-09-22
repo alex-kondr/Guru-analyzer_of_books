@@ -36,8 +36,29 @@
 
 .work-file {
     position: absolute;
-    right: 15px;
+    right: 60px;
     width: 70%;
+}
+
+.swal-modal {
+    background-color: #1A1C1F;
+    font-size: 16px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.21);
+    margin-bottom: 28px;
+    border: 3px solid #0a53be;
+}
+
+.swal-text {
+    background-color: #1A1C1F;
+    text-align: center;
+    color: #c6c7c8;
+}
+
+.swal-button {
+    padding: 7px 19px;
+    border-radius: 4px;
+    background-color: #0a58ca;
+    font-size: 12px;
 }
 
 #chat-form {
@@ -71,23 +92,9 @@
     display: none;
 }
 
-.swal-modal {
-    background-color: #1A1C1F;
-    font-size: 16px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.21);
-    margin-bottom: 28px;
-    border: 3px solid #0a53be;
-}
-
-.swal-text {
-    background-color: #1A1C1F;
-    text-align: center;
-    color: #c6c7c8;
-}
-
-.swal-button {
-    padding: 7px 19px;
-    border-radius: 4px;
-    background-color: #0a58ca;
-    font-size: 12px;
+#btn_close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    /*margin-left: 5px;*/
 }

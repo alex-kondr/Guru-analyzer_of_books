@@ -104,6 +104,3 @@ async function sendMessage(message_text, doc_id) {
         }
     }
 }
-
-
-
