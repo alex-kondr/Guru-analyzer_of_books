@@ -1,0 +1,39 @@
+body,
+html {
+    padding: 2rem 50px 50px;
+    font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    align-content: center;
+    /*background-color: #1A1C1F;*/
+
+    background-image: url("/static/img/background.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+}
+
+h1 {
+    /*color: #0DCA1B;*/
+    color: #0dcaf0;
+}
+
+.template {
+    height: 100%;
+    width: 100%;
+}
+
+.invalid input:required:invalid {
+    background: #BE4C54;
+}
+
+.invalid input:required:valid {
+    background: #17D654;
+}
