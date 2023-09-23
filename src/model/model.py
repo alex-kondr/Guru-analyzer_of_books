@@ -31,6 +31,7 @@ EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
     file_path = str(file_path)
     if file_path.lower().endswith(".pdf"):
+        print("choice pdf method")
         loader = PyPDFLoader(file_path)
         pages = loader.load_and_split()
 
@@ -70,6 +71,7 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
     # Create/update the vector store
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
+    print("saved vector db")
 
 
 async def load_vector_db(document_id: int):
