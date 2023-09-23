@@ -24,8 +24,6 @@ async def create_document(file: UploadFile, user_id: int, db: Session) -> Docume
 
     temp_path = constants.VECTOR_DB_PATH / "temp"
     temp_path.mkdir(exist_ok=True)
-    print("created temp")
-    print("file", file.filename)
 
     document = await get_document_by_name(file.filename, user_id, db)
     if not document:
@@ -35,13 +33,10 @@ async def create_document(file: UploadFile, user_id: int, db: Session) -> Docume
         with open(file_path, "wb") as fh:
             shutil.copyfileobj(file.file, fh)
 
-        print("created file")
-
         document = Document(user_id=user_id, name=file.filename)
         db.add(document)
         db.commit()
         db.refresh(document)
-        print("saved file to db")
 
         await convert_document_to_vector_db(file_path=file_path, document_id=document.id)
         os.remove(file_path)

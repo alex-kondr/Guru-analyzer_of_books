@@ -25,18 +25,15 @@ from src.conf.config import settings
 from src.conf import constants
 from src.conf import messages
 
+
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 
 
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
     file_path = str(file_path)
-    print(f"{document_id=}")
     if file_path.lower().endswith(".pdf"):
-        print("choice pdf method")
         loader = PyPDFLoader(file_path)
-        print("created loader")
         pages = loader.load_and_split()
-        print("created pages")
 
     elif file_path.lower().endswith(".docx") or file_path.lower().endswith(".doc"):
         word_doc = Document(file_path)
@@ -67,17 +64,13 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         chunk_overlap=64,
         separators=['\n\n', '\n', '(?=>\. )', ' ', '']
     )
-    print("created text_splitter")
 
     # Split the pages into texts as defined above
     texts = text_splitter.split_documents(pages)
-    print("created texts")
 
     # Create/update the vector store
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
-    print("created vector db")
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
-    print("saved vector db")
 
 
 async def load_vector_db(document_id: int):
@@ -118,7 +111,9 @@ async def answer_generate(document_id: int, question: str) -> Dict:
 
 
 async def document_summary_generate(document_id: int, sentences_count: int = 5):
+    print("start summary")
     vector_db = await load_vector_db(document_id)
+    print("loaded vector db")
     docs = vector_db.similarity_search_with_score('', k=10000)
     text_load = ''
     for i in range(len(docs) - 1):
