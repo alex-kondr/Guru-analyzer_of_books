@@ -70,8 +70,6 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
     # Create/update the vector store
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
-    for item in Path(constants.VECTOR_DB_PATH).iterdir():
-        print(item)
 
 
 async def load_vector_db(document_id: int):

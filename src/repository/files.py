@@ -29,7 +29,6 @@ async def create_document(file: UploadFile, user_id: int, db: Session) -> Docume
     if not document:
 
         file_path = temp_path / file.filename
-        print(f"{file_path=}")
         with open(file_path, "wb") as fh:
             shutil.copyfileobj(file.file, fh)
 
