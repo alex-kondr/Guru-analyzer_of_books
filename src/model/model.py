@@ -14,7 +14,6 @@ from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
-import spacy
 from spacy.lang.en.stop_words import STOP_WORDS as spacy_SW
 from string import punctuation as punct
 from heapq import nlargest
@@ -117,38 +116,18 @@ async def answer_generate(document_id: int, question: str) -> Dict:
 
 
 async def document_summary_generate(document_id: int, sentences_count: int = 5):
-    log = get_logger("test")
-    log.log(logging.DEBUG, "start summary")
     vector_db = await load_vector_db(document_id)
-    log.log(logging.DEBUG, "loaded vector db")
     docs = vector_db.similarity_search_with_score('', k=10000)
-    log.log(logging.DEBUG, "created docx")
     text_load = ''
     for i in range(len(docs) - 1):
         text_load += docs[i][0].page_content
 
-    log.log(logging.DEBUG, "created text_load")
     sp_stopwords = list(spacy_SW)
-    log.log(logging.DEBUG, "created sp_stopwords")
     punctuation = punct
-    log.log(logging.DEBUG, "created punctuation")
     punctuation = punctuation + '\n'
 
-    log.log(logging.DEBUG, "try spacy")
-
-    log.log(logging.DEBUG, "try try spacy")
-    # nlp = spacy.load("en_core_web_sm")
-    log.log(logging.DEBUG, "load nlp")
-    nlp = en_core_web_sm.__version__
-    log.log(logging.DEBUG, f"print nlp {nlp}")
     nlp = en_core_web_sm.load()
-    log.log(logging.DEBUG, "load spacy")
-
-    log.log(logging.DEBUG, "created nlp")
-
     doc = nlp(text_load)
-    log.log(logging.DEBUG, "created doc")
-
     word_frequencies = {}
     for word in doc:
         if word.text.lower() not in sp_stopwords:
@@ -157,14 +136,12 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
                     word_frequencies[word.text] = 1
                 else:
                     word_frequencies[word.text] += 1
-    log.log(logging.DEBUG, "created word_frequencies")
+
     max_frequency = max(word_frequencies.values())
     for word in word_frequencies.keys():
         word_frequencies[word] = word_frequencies[word] / max_frequency
 
-    log.log(logging.DEBUG, "created max_frequency")
     sentence_tokens = list(doc.sents)
-    log.log(logging.DEBUG, "created sentence_tokens")
     sentence_score = {}
     for sent in sentence_tokens:
         for word in sent:
@@ -174,12 +151,8 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
                 else:
                     sentence_score[sent] += word_frequencies[word.text.lower()]
 
-    log.log(logging.DEBUG, "created sentence_score")
     summary = nlargest(sentences_count, sentence_score, key=sentence_score.get)
-    log.log(logging.DEBUG, "created summary")
     summary = [summ.text for summ in summary]
-    log.log(logging.DEBUG, "created summary list")
-    log.log(logging.DEBUG, "try join")
     return "\n".join(summary)
 
 
