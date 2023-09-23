@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>MAIN_APP</title>
+
+  <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/chat.css">
+  <script src="/static/js/auth.js"></script>
+</head>
+<body>
+<!-- Modal for login -->
+<div class="modal fade" id="LoginForm" tabindex="-1" aria-labelledby="basicModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="basicModalLabel">Login</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="UserEmail" placeholder="name@example.com">
+          <label for="UserEmail">Email address</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="UserPass" placeholder="Password">
+          <label for="UserPass">Password</label>
+        </div>
+        <div class="col-12 mt-3">
+          <div class="form-check">
+            <input class="form-check-input" onclick="RememberMeClick(this)" type="checkbox" value="0" id="RememberMe">
+            <label class="form-check-label" for="RememberMe">
+              Remember me
+            </label>
+          </div>
+        </div>
+        <div class="col-12 mt-3">
+          <a href="#" onclick="ForgotPassword()">Forgot password?</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Login</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <div class="col-12 text-center mt-3">
+          <p>Not a member? <a href="#" onclick="RegistrationFormShow()">Register</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal for login-->
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+  <div class="navbar-brand">CHAT ASSISTANT</div>
+
+  <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarsExampleDefault"
+      aria-controls="navbarsExampleDefault"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/chat">Chat</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/docs" target="_blank">Docs</a>
+      </li>
+    </ul>
+  </div>
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item">
+        <a class="nav-link" onclick="LoginFormShow()" href="#">Login</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<main class="template" role="main">
+    {% block content %}
+    {% endblock %}
+</main>
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/chat.js"></script>
+  <script src="/static/js/files.js"></script>
+  <script src="/static/js/sweetalert.min.js"></script>
+</body>
+</html>

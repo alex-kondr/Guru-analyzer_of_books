@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Modal for deleting a file -->
+<div class="modal fade" id="DeleteFile" tabindex="-1" aria-labelledby="basicModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="basicModalLabel">Deleting a File</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="col-xs-2 control-label">Do you want to
+          <span style="font-weight:bold;color:red">delete</span> the file ?
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal for deleting a file-->
+
+<div class="chat-body card">
+  <div class="card-body" id="chat_box">
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-chat-tab" data-bs-toggle="pill"
+                data-bs-target="#pills-home" type="button" role="tab">Chat
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-files-tab" data-bs-toggle="pill"
+                data-bs-target="#pills-profile" type="button" role="tab">Files
+        </button>
+      </li>
+      <li class="work-file">
+        <div class="input-group" id="work_file_group">
+          <input type="text" class="form-control" value=""
+                 id="work_file" data-bs-id="" placeholder="Work file" readonly>
+          <div class="input-group-append">
+          </div>
+          <button class="btn btn-outline-secondary" id="btn_history">
+            <i class="fa fa-history" id="get_history"></i>
+          </button>
+          <button class="btn btn-outline-secondary" id="btn_summary">
+            <i class="fa fa-wand-magic-sparkles" id="get_summary"></i>
+          </button>
+        </div>
+      </li>
+    </ul>
+    <button type="button" class="btn-close" id="btn_close"
+            onclick="window.location.href = '\\';"></button>
+    <hr>
+    <div class="tab-content" id="pills-tabContent">
+      <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+        <div id="messages">
+        </div>
+        <form class="form-inline" id="chat-form">
+          <div class="input-group" id="chat_input">
+            <input type="text" class="form-control" id="msg_input" placeholder="Write your message...">
+            <button class="btn btn-outline-secondary" id="btn_submit">
+              <i class="fa fa-sign-out" id="send_glyph"></i>
+              <i class="spinner-border spinner-border-sm" id="send_spin"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+        <div class="container" id="data_files">
+          <div class="row">
+            <div class="col-12">
+              <div class="container">
+                <nav class="navbar">
+                  <form class="form-inline" id="filter-form">
+                    <div class="input-group" id="filter_input">
+                      <input type="search" class="form-control" id="filter_str" placeholder="Search">
+                      <button class="btn btn-outline-success text-nowrap" id="btn_search">
+                        <span class="btn-label"><i class="fa fa-refresh"></i></span></button>
+                    </div>
+                  </form>
+                  <div class='d-flex justify-content-end'>
+                    <button class="btn btn-outline-primary text-nowrap" id="btn_add_file"
+                            onclick="uploadFiles()">
+                      <i class="spinner-border spinner-border-sm" id="add_file_spin"></i>
+                      <i class="btn-label"><i class="fa fa-file-pdf" id="add_file_glyph"></i></i> Add file
+                    </button>
+                  </div>
+                </nav>
+              </div>
+
+              <div class="container mb-3 mt-2">
+                <table class="table table-bordered table-striped" id="ContactsTable">
+                  <thead class="table-dark">
+                  <tr>
+                    <th data-type = "number" style="width: 10%"
+                        data-bs-sort_order="-1">Id</th>
+                    <th data-type = "string" style="width: 80%"
+                        data-bs-sort_order="-1">File name</th>
+                    <th data-type = "button" style="width: 10%"
+                        data-bs-sort_order="-1" colspan="2">Action</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    window.onbeforeunload = e => e.returnValue;
+</script>
+{% endblock %}
