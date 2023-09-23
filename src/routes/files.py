@@ -82,7 +82,7 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
     print(f"{document.id=}")
     print("try summary")
-    summary = await document_summary_generate(document_id, sentences_count)
+    summary = document_summary_generate(document_id, sentences_count)
 
     return {"summary": summary}
 
