@@ -20,6 +20,8 @@ from string import punctuation as punct
 from heapq import nlargest
 from docx import Document
 
+import en_core_web_sm
+
 from src.conf.logger import get_logger
 from src.conf.config import settings
 from src.conf import constants
