@@ -29,8 +29,8 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     return {'access_token': access_token, 'refresh_token': refresh_token, 'token_type': 'bearer'}
 
 
-@router.post('/singup', response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def singup(body: UserModel, db: Session = Depends(get_db)) -> dict:
+@router.post('/signup', response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def signup(body: UserModel, db: Session = Depends(get_db)) -> dict:
 
     exist_user = await repository_users.get_user_by_email(body.email, db)
     if exist_user:
