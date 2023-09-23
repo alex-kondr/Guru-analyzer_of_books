@@ -1,10 +1,4 @@
-import os
-
 from pydantic import BaseSettings
-
-
-os.system("python3 -m spacy download en_core_web_sm")
-os.system("py -m spacy download en_core_web_sm")
 
 
 class Settings(BaseSettings):

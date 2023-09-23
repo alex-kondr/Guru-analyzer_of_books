@@ -823,6 +823,24 @@ files = [
 dev = ["coverage", "coveralls", "pytest"]
 
 [[package]]
+name = "en-core-web-sm"
+version = "2.2.5"
+description = "English multi-task CNN trained on OntoNotes. Assigns context-specific token vectors, POS tags, dependency parse and named entities."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "en_core_web_sm-2.2.5.tar.gz", hash = "sha256:60b69065c97fd2e4972c33300205e1dead3501d2e0bfd6a182c3a033e337caee"},
+]
+
+[package.dependencies]
+spacy = ">=2.2.2"
+
+[package.source]
+type = "url"
+url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.5/en_core_web_sm-2.2.5.tar.gz"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.1.3"
 description = "Backport of PEP 654 (exception groups)"
@@ -3676,4 +3694,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "6e490bba1d826b19622e0b091b886ca0658bf3b9ab35ba61b02a32271a6f930c"
+content-hash = "329a164cf0307293d70985ca39f41778e2bbb0b76216c436d1a0311afe874ea3"
