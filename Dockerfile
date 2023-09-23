@@ -3,6 +3,8 @@ FROM python:3.10
 WORKDIR /app
 
 COPY src /app/src
+COPY static /app/static
+COPY templates /app/templates
 COPY main.py /app
 COPY requirements.txt /app
 
