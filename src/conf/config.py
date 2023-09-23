@@ -16,4 +16,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = settings.huggingfacehub_api_token

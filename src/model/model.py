@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from typing import Union, Dict
@@ -13,6 +14,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from docx import Document
 
+from src.conf.logger import get_logger
 from src.conf.config import settings
 from src.conf import constants
 from src.conf import messages
@@ -73,8 +75,12 @@ async def load_vector_db(document_id: int):
 
 
 async def delete_vector_db(document_id: int):
-    os.remove(constants.VECTOR_DB_PATH / f"{document_id}.faiss")
-    os.remove(constants.VECTOR_DB_PATH / f"{document_id}.pkl")
+    try:
+        os.remove(constants.VECTOR_DB_PATH / f"{document_id}.faiss")
+        os.remove(constants.VECTOR_DB_PATH / f"{document_id}.pkl")
+    except FileNotFoundError as err:
+        logger = get_logger("Not found")
+        logger.log(level=logging.DEBUG, msg=str(err))
 
 
 async def answer_generate(document_id: int, question: str):
