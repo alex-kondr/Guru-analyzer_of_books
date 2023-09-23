@@ -5,16 +5,23 @@ async function RegistrationFormShow() {
     const modal_form = document.getElementById("RegistrationForm")
     const modal = new bootstrap.Modal(modal_form);
 
-    modal_form.querySelector("#UserName").value = "";
-    modal_form.querySelector("#UserEmail").value = "";
-    modal_form.querySelector("#UserPass").value = "";
+    const user_name = modal_form.querySelector("#user_name")
+    const user_email = modal_form.querySelector("#user_email")
+    const user_pass = modal_form.querySelector("#user_pass")
+
+    user_name.value = "";
+    user_email.value = "";
+    user_pass.value = "";
 
     const submit_btn = modal_form.querySelector(".btn-primary");
     submit_btn.onclick = async function () {
+        if (user_name.value === "" || user_email.value === "" || user_pass.value === ""){
+            swal("Specify all input fields");
+            return;
+        }
         if (await registerUser())
             modal.hide();
     };
-
     modal.show();
 }
 
@@ -31,41 +38,27 @@ async function LoginFormShow() {
         if (await loginUser())
             modal.hide();
     };
-
     modal.show();
 }
 
 async function registerUser() {
-    const user_name = document.getElementById("UserName").value;
-
     const response = await fetch("/api/auth/signup/", {
         method: "POST",
         headers: {"Accept": "application/json", "Content-Type": "application/json"},
         body: JSON.stringify({
-            username: user_name ? user_name : null,
-            email: document.getElementById("UserEmail").value,
-            password: document.getElementById("UserPass").value
+            username: document.getElementById("user_name").value,
+            email: document.getElementById("user_email").value,
+            password: document.getElementById("user_pass").value
         })
     });
-    const result = await response.json();
-    if (response.ok !== true) {
-        if (response.status === 422) {
-            swal("Input data is invalid");
-        } else swal(result.detail);
-    } else swal(result.detail);
+    if (response.ok === true)
+        await LoginFormShow();
+    else await error_code_processing(response);
     return response.ok
 }
 
 async function loginUser() {
     const modal_form = document.getElementById("LoginForm")
-
-    // const rmCheck = modal_form.querySelector("#RememberMe")
-    // const emailInput = modal_form.querySelector("#UserEmail");
-    //
-    // if (rmCheck.checked)
-    //   localStorage.username = emailInput.value;
-    // else
-    //   localStorage.username = "";
 
     const response = await fetch("/api/auth/login/", {
         method: "POST",
@@ -82,14 +75,11 @@ async function loginUser() {
             const result = await response.json()
             localStorage.setItem('accessToken', result.access_token)
             localStorage.setItem('refreshToken', result.refresh_token)
+            const btn_login = document.getElementById("btn_login");
+            btn_login.style.display = "none";
         }
-    } else {
-        const error = await response.json();
-        if (response.status === 422) {
-            swal("Input data is invalid");
-        } else
-            swal(error.detail);
     }
+    else await error_code_processing(response);
     return response.ok
 }
 
@@ -97,56 +87,18 @@ function RememberMeClick(rmCheck) {
     rmCheck.value = rmCheck.checked ? "1" : "0";
 }
 
-async function ForgotPassword() {
-    const modal_form = document.getElementById("LoginForm")
-    const response = await fetch("/api/auth/forgot_password/", {
-        method: "POST",
-        headers: {"Accept": "application/json", "Content-Type": "application/json"},
-        body: JSON.stringify({
-            email: modal_form.querySelector("#UserEmail").value
-        })
-    });
-    if (response.ok !== true) {
-        const error = await response.json();
-        if (response.status === 422) {
-            swal("Input data is invalid");
-        } else
-            swal(error.detail);
-    } else {
-        const message = await response.json();
-        swal(message.detail);
-        const modal_login_form = bootstrap.Modal.getInstance(modal_form);
-        if (modal_login_form) modal_login_form.hide();
-    }
-}
-
-async function ChangePassword() {
-    const form = document.getElementById("ChangePasswordForm")
-    const current_url = window.location.href;
-    const new_password = form.querySelector("#UserPassNew").value;
-    const conf_password = form.querySelector("#UserPassConf").value;
-
-    if (new_password !== conf_password) {
-        swal("The new password does not equal the confirmed password.");
-    } else {
-        const response = await fetch(current_url, {
-            method: "PUT",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                password: new_password
-            })
-        });
-        const result = await response.json();
-        if (response.ok !== true) {
-            if (response.status === 422)
-                swal("Input data is invalid");
-            else swal(result.detail);
-        } else {
-            swal(result.detail);
-            window.location.href = "\\";
+async function checkUser() {
+    const token = localStorage.getItem('accessToken');
+    const response = await fetch("/api/users/me", {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`,
         }
+    });
+
+    if (response.ok !== true) {
+        const btn_login = document.getElementById("btn_login");
+        btn_login.style.display = "inline-block";
     }
 }

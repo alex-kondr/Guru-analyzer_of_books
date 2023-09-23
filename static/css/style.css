@@ -8,7 +8,6 @@ html {
     align-items: stretch;
     justify-content: center;
     align-content: center;
-    /*background-color: #1A1C1F;*/
 
     background-image: url("/static/img/background.jpg");
     background-repeat: no-repeat;
@@ -18,10 +17,10 @@ html {
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
+    opacity: 0.97
 }
 
 h1 {
-    /*color: #0DCA1B;*/
     color: #0dcaf0;
 }
 

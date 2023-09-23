@@ -62,8 +62,7 @@ async function uploadFiles() {
                     document.querySelector("tbody").append(newTableRow(created_files[i]));
                 }
             }
-        }
-        finally {
+        } finally {
             add_file_glyph.style.display = "inline-block";
             add_file_spin.style.display = "none";
         }
@@ -84,16 +83,9 @@ async function sendFile(file) {
         },
         body: form_data
     });
-    if (response.ok === true) {
-        result =  await response.json();
-    } else {
-        if (response.status === 422)
-            swal("Input data is invalid");
-        else {
-            const error = await response.json();
-            swal(error.detail);
-        }
-    }
+    if (response.ok === true)
+        result = await response.json();
+    else await error_code_processing(response);
     return result
 }
 
@@ -121,7 +113,6 @@ btn_history.onclick = async function (e) {
 async function getLastFile() {
     const token = localStorage.getItem('accessToken');
     let last_doc = null;
-
     const response = await fetch("/api/files/last_document", {
         method: "GET",
         headers: {
@@ -130,18 +121,9 @@ async function getLastFile() {
         }
     });
 
-    if (response.ok === true) {
+    if (response.ok === true)
         last_doc = await response.json();
-    } else {
-        if (response.status === 401)
-            swal("Not authenticated");
-        else if (response.status === 404)
-            swal("You don't have a message history yet.");
-        else {
-            const error = await response.json();
-            swal(error.detail);
-        }
-    }
+    else await error_code_processing(response);
 
     return last_doc;
 }
@@ -159,24 +141,15 @@ async function getHistory(file_id) {
         }
     });
 
-    if (response.ok === true) {
+    if (response.ok === true)
         history = await response.json();
-    } else {
-        if (response.status === 401)
-            swal("Not authenticated");
-        else if (response.status === 404)
-            swal("You don't have a message history yet.");
-        else {
-            const error = await response.json();
-            swal(error.detail);
-        }
-    }
+    else await error_code_processing(response);
 
     return history;
 }
 
 async function showHistory(history) {
-    if (history){
+    if (history) {
         global_mdg.replaceChildren();
         history.forEach(rec => createHistoryMessage(rec));
         global_mdg.scrollTop = global_mdg.scrollHeight;
@@ -189,7 +162,7 @@ function createHistoryMessage(rec) {
     messages.forEach(msg => printMessage(msg));
 }
 
-function printMessage (msg){
+function printMessage(msg) {
     const messageContent = document.createElement("div");
 
     if (msg["sender"])
@@ -237,39 +210,24 @@ async function getFiles(filter_str) {
             rows.deleteRow(0);
 
         files.forEach(file => rows.append(newTableRow(file)));
-    } else {
-        if (response.status === 401)
-            swal("Not authenticated");
-        else {
-            const error = await response.json();
-            swal(error.detail);
-        }
-    }
+    } else await error_code_processing(response);
 }
 
 async function deleteFile(file_id) {
-  const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
 
-  const response = await fetch(`/api/files/${file_id}`, {
-    method: "DELETE",
-    headers: {
-      "Accept": "application/json",
-      Authorization: `Bearer ${token}`
-    },
+    const response = await fetch(`/api/files/${file_id}`, {
+        method: "DELETE",
+        headers: {
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`
+        },
 
-  });
-  if (response.ok === true) {
-    document.querySelector(`tr[data-rowid='${file_id}']`).remove();
-  }
-  else {
-    if (response.status === 401)
-      swal("Not authenticated");
-    else {
-      const error = await response.json();
-      swal(error.detail);
-    }
-  }
-  return response.ok;
+    });
+    if (response.ok === true)
+        document.querySelector(`tr[data-rowid='${file_id}']`).remove();
+    else await error_code_processing(response);
+    return response.ok;
 }
 
 async function DeleteFileFormShow(file_id) {
