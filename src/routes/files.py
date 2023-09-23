@@ -83,13 +83,10 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
     document = await repository_files.get_document_by_id(document_id=document_id,
                                                          user_id=current_user.id,
                                                          db=db)
-    print(f"{document=}")
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
-    print(f"{document.id=}")
-    print("try summary")
-    summary = document_summary_generate(document_id, sentences_count)
 
+    summary = await document_summary_generate(document_id, sentences_count)
     return {"summary": summary}
 
 

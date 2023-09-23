@@ -118,10 +118,8 @@ async def answer_generate(document_id: int, question: str) -> Dict:
 async def document_summary_generate(document_id: int, sentences_count: int = 5):
     log = get_logger("test")
     log.log(logging.DEBUG, "start summary")
-    print("start summary")
     vector_db = await load_vector_db(document_id)
     log.log(logging.DEBUG, "loaded vector db")
-    print("loaded vector db")
     docs = vector_db.similarity_search_with_score('', k=10000)
     log.log(logging.DEBUG, "created docx")
     text_load = ''
@@ -137,7 +135,9 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
 
     log.log(logging.DEBUG, "try spacy")
     try:
+        log.log(logging.DEBUG, "try try spacy")
         nlp = spacy.load("en_core_web_sm")
+        log.log(logging.DEBUG, "load spacy")
     except:
         log.log(logging.DEBUG, "not spacy")
         log.log(logging.DEBUG, spacy.errors)
