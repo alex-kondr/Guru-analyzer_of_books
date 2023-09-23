@@ -74,7 +74,7 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         print(item)
 
 
-def load_vector_db(document_id: int):
+async def load_vector_db(document_id: int):
     if (not Path(f"{constants.VECTOR_DB_PATH}/{document_id}.faiss").exists()
             or not Path(f"{constants.VECTOR_DB_PATH}/{document_id}.pkl").exists()):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.VECTOR_DB_NOT_FOUND)
@@ -95,7 +95,7 @@ async def delete_vector_db(document_id: int):
 
 
 async def answer_generate(document_id: int, question: str) -> Dict:
-    vector_db = load_vector_db(document_id)
+    vector_db = await load_vector_db(document_id)
 
     llm = HuggingFaceHub(repo_id="tiiuae/falcon-7b",
                          model_kwargs={"temperature": 0.5,
@@ -119,16 +119,20 @@ def document_summary_generate(document_id: int, sentences_count: int = 5):
     log = get_logger("test")
     log.log(logging.DEBUG, "start summary")
     print("start summary")
-    vector_db = load_vector_db(document_id)
+    vector_db = await load_vector_db(document_id)
     log.log(logging.DEBUG, "loaded vector db")
     print("loaded vector db")
     docs = vector_db.similarity_search_with_score('', k=10000)
+    log.log(logging.DEBUG, "created docx")
     text_load = ''
     for i in range(len(docs) - 1):
         text_load += docs[i][0].page_content
 
+    log.log(logging.DEBUG, "created text_load")
     sp_stopwords = list(spacy_SW)
+    log.log(logging.DEBUG, "created sp_stopwords")
     punctuation = punct
+    log.log(logging.DEBUG, "created punctuation")
     punctuation = punctuation + '\n'
 
     log.log(logging.DEBUG, "try spacy")
