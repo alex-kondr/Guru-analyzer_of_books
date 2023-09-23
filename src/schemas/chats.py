@@ -17,10 +17,12 @@ class ChatHistoryResponse(BaseModel):
     question: str
     answer: str
     created_at: datetime
-    updated_at: datetime
 
     class Config:
         orm_mode = True
+        json_encoders = {
+            datetime: lambda dt: dt.strftime('%d-%m-%Y %H:%M')
+        }
 
 
 class ChatResponse(BaseModel):

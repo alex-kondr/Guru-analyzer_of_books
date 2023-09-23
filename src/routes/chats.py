@@ -29,10 +29,15 @@ async def read_chat_by_document_id(document_id: int,
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
-    return await repository_chats.get_chat_by_document_id(document_id=document_id,
-                                                          user_id=current_user.id,
-                                                          last_question_count=last_question_count,
-                                                          db=db)
+    chat_history = await repository_chats.get_chat_by_document_id(document_id=document_id,
+                                                                  user_id=current_user.id,
+                                                                  last_question_count=last_question_count,
+                                                                  db=db)
+
+    if not chat_history:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_CHATHISTORY_NOT_FOUND)
+
+    return chat_history
 
 
 @router.post("/", name="Ask a question to file", response_model=ChatResponse)
