@@ -135,15 +135,13 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
     punctuation = punctuation + '\n'
 
     log.log(logging.DEBUG, "try spacy")
-    try:
-        log.log(logging.DEBUG, "try try spacy")
-        nlp = spacy.load("en_core_web_sm")
-        log.log(logging.DEBUG, "load spacy")
-    except OSError as err:
-        log.log(logging.DEBUG, "not spacy")
-        log.log(logging.DEBUG, str(err))
-        log.log(logging.DEBUG, spacy.errors)
-        return "not load spacy"
+
+    log.log(logging.DEBUG, "try try spacy")
+    nlp = spacy.load("en_core_web_sm")
+    log.log(logging.DEBUG, "load nlp")
+    nlp = en_core_web_sm.load()
+    log.log(logging.DEBUG, "load spacy")
+
     log.log(logging.DEBUG, "created nlp")
 
     doc = nlp(text_load)
