@@ -18,9 +18,15 @@ router = APIRouter(prefix="/files", tags=["files"])
 @router.get("/", name="Return all user's files", response_model=List[Document])
 async def get_files(search_str: str = None, db: Session = Depends(get_db),
                     current_user: User = Depends(auth_service.get_current_user)):
-    return await repository_files.get_user_documents(search_str=search_str,
-                                                     user_id=current_user.id,
-                                                     db=db)
+
+    documents = await repository_files.get_user_documents(search_str=search_str,
+                                                          user_id=current_user.id,
+                                                          db=db)
+    if not documents:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENTS_NOT_FOUND)
+
+    return documents
+
 
 
 @router.post("/doc",
