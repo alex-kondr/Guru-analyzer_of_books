@@ -21,3 +21,5 @@ STATIC.mkdir(exist_ok=True)
 
 VECTOR_DB_PATH = STATIC / "vector_db_path"
 VECTOR_DB_PATH.mkdir(exist_ok=True)
+
+ALLOWED_FILES_EXTENSIONS = ['.pdf', '.txt', '.doc', '.docx']

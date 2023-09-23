@@ -83,5 +83,4 @@ async def get_last_user_document_id(user_id: int, db: Session) -> int | None:
                         .order_by(desc(ChatHistory.id))
                         .limit(1).first()
                         )
-
-    return last_chathistory.document_id
+    return last_chathistory.document_id if last_chathistory else None
