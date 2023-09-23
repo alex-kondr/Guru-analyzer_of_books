@@ -4,7 +4,7 @@ from pydantic import BaseSettings
 
 try:
     os.system("python3 -m spacy download en_core_web_sm")
-except:
+except OSError:
     os.system("py -m spacy download en_core_web_sm")
 
 
