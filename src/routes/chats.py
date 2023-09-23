@@ -45,33 +45,37 @@ async def ask_question(body: ChatQuestion,
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
-    answer = await answer_generate(body.document_id, body.question)
+    result = await answer_generate(body.document_id, body.question)
 
     await repository_chats.save_chat(
         document_id=body.document_id,
         question=body.question,
-        answer=answer,
+        answer=result["answer"],
         user_id=current_user.id,
         db=db
     )
 
-    return {"answer": answer}
+    return {"answer": result["answer"]}
 
 
-@router.post("/summary/{document_id}", name="Make last answers summary", response_model=ChatResponse)
-async def make_chathistory_summary_by_document_id(document_id: int,
-                                                  last_question_count: int = None,
+@router.post("/summary", name="Make last answers summary", response_model=ChatResponse)
+async def make_chathistory_summary_by_document_id(last_question_count: int = None,
                                                   sentences_count: int = 5,
                                                   db: Session = Depends(get_db),
                                                   current_user: User = Depends(auth_service.get_current_user)):
 
-    document = await repository_files.get_document_by_id(document_id=document_id,
+    last_document_id = await repository_files.get_last_user_document_id(user_id=current_user.id,
+                                                                        db=db)
+    if last_document_id is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
+
+    document = await repository_files.get_document_by_id(document_id=last_document_id,
                                                          user_id=current_user.id,
                                                          db=db)
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
-    chat_history = await repository_chats.get_chat_by_document_id(document_id=document_id,
+    chat_history = await repository_chats.get_chat_by_document_id(document_id=last_document_id,
                                                                   user_id=current_user.id,
                                                                   last_question_count=last_question_count,
                                                                   db=db)
@@ -80,7 +84,7 @@ async def make_chathistory_summary_by_document_id(document_id: int,
 
     answers_for_make_summary = ' '.join(history_answers)
 
-    answer = await chathistory_summary_generate(document_id=document_id,
+    answer = await chathistory_summary_generate(document_id=last_document_id,
                                                 chathistory=answers_for_make_summary,
                                                 sentences_count=sentences_count)
 
