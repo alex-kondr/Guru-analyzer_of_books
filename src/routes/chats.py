@@ -13,6 +13,7 @@ from src.repository import files as repository_files
 from src.model.model import answer_generate, chathistory_summary_generate
 from src.conf import messages
 
+
 router = APIRouter(prefix="/chats", tags=["chats"])
 
 

@@ -1,5 +1,6 @@
 import pathlib
 
+import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -10,8 +11,8 @@ from sqlalchemy import text
 from src.database.db import get_db
 from src.routes import front, auth, chats, files, users
 
-BASE_DIR = pathlib.Path(__file__).parent
 
+BASE_DIR = pathlib.Path(__file__).parent
 app = FastAPI()
 
 app.add_middleware(
@@ -43,3 +44,7 @@ app.include_router(auth.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
 app.include_router(chats.router, prefix="/api")
 app.include_router(files.router, prefix="/api")
+
+
+if __name__ == '__main__':
+    uvicorn.run('main:app', port=8000, reload=True)
