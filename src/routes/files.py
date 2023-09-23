@@ -1,16 +1,17 @@
 from typing import List
-
 from fastapi import APIRouter, Depends, UploadFile, Path, HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
 from src.database.models import User
 from src.services.auth import auth_service
+from src.services.files import check_url_exists
 from src.repository import files as repository_files
 from src.schemas.files import Document
 from src.schemas.chats import ChatResponse, SummaryResponse
 from src.model.model import document_summary_generate
 from src.conf import messages
+from src.conf import constants
 
 router = APIRouter(prefix="/files", tags=["files"])
 
@@ -43,6 +44,12 @@ async def add_file(file: UploadFile,
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=file.filename))
 
+    file_extension = "." + file.filename.split(".")[-1].lower()
+
+    if file_extension not in constants.ALLOWED_FILES_EXTENSIONS:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=messages.FILE_TYPE_IS_NOT_SUPPORTED)
+
     return await repository_files.create_document(file, current_user.id, db)
 
 
@@ -57,7 +64,11 @@ async def add_text_by_url(url: str,
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=url))
 
-    return await repository_files.create_document_by_url(url, current_user.id, db)
+    if check_url_exists(url):
+        return await repository_files.create_document_by_url(url, current_user.id, db)
+    else:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=messages.URL_DOES_NOT_EXIST.format(url=url))
 
 
 @router.delete("/{document_id}", name="Delete document")
@@ -90,8 +101,8 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
 
 
 @router.get("/last_document", name="Return last chated document", response_model=Document)
-async def get_files(db: Session = Depends(get_db),
-                    current_user: User = Depends(auth_service.get_current_user)):
+async def get_last_document(db: Session = Depends(get_db),
+                            current_user: User = Depends(auth_service.get_current_user)):
     last_document_id = await repository_files.get_last_user_document_id(user_id=current_user.id, db=db)
     if last_document_id:
         return await repository_files.get_document_by_id(document_id=last_document_id,
