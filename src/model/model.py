@@ -95,7 +95,8 @@ async def delete_vector_db(document_id: int):
 async def answer_generate(document_id: int, question: str) -> Dict:
     vector_db = await load_vector_db(document_id)
 
-    llm = HuggingFaceHub(repo_id="tiiuae/falcon-7b",
+    llm = HuggingFaceHub(huggingfacehub_api_token=settings.huggingfacehub_api_token,
+                         repo_id="tiiuae/falcon-7b",
                          model_kwargs={"temperature": 0.5,
                                        "max_length": 512,
                                        "max_new_tokens": 200
@@ -136,8 +137,9 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
         log.log(logging.DEBUG, "try try spacy")
         nlp = spacy.load("en_core_web_sm")
         log.log(logging.DEBUG, "load spacy")
-    except:
+    except OSError as err:
         log.log(logging.DEBUG, "not spacy")
+        log.log(logging.DEBUG, str(err))
         log.log(logging.DEBUG, spacy.errors)
         return "not load spacy"
     log.log(logging.DEBUG, "created nlp")
