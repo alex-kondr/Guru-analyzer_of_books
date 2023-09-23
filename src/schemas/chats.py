@@ -27,6 +27,10 @@ class ChatResponse(BaseModel):
     answer: str
 
 
+class SummaryResponse(BaseModel):
+    summary: str
+
+
 class ChatQuestion(BaseModel):
     document_id: int
     question: str

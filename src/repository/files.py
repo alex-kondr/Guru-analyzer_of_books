@@ -78,10 +78,10 @@ async def get_user_documents(search_str: str, user_id: int, db: Session) -> List
 
 async def get_last_user_document_id(user_id: int, db: Session) -> int | None:
 
-    last_chathistory = db.query(ChatHistory).filter(ChatHistory.user_id == user_id)\
-        .order_by(desc(ChatHistory.id)).limit(1).first()
+    last_chathistory = (db.query(ChatHistory)
+                        .filter(ChatHistory.user_id == user_id)
+                        .order_by(desc(ChatHistory.id))
+                        .limit(1).first()
+                        )
 
-    if last_chathistory:
-        return last_chathistory.document_id
-    else:
-        return None
+    return last_chathistory.document_id

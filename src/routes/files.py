@@ -8,7 +8,7 @@ from src.database.models import User
 from src.services.auth import auth_service
 from src.repository import files as repository_files
 from src.schemas.files import Document
-from src.schemas.chats import ChatResponse
+from src.schemas.chats import ChatResponse, SummaryResponse
 from src.model.model import document_summary_generate
 from src.conf import messages
 
@@ -68,7 +68,7 @@ async def delete_file(document_id: int = Path(ge=1),
     return await repository_files.delete_document_by_id(document_id, current_user.id, db)
 
 
-@router.post("/summary/{document_id}", name="Make document summary", response_model=ChatResponse)
+@router.post("/summary/{document_id}", name="Make document summary", response_model=SummaryResponse)
 async def make_summary_by_document_id(document_id: int = Path(ge=1),
                                       sentences_count: int = 5,
                                       db: Session = Depends(get_db),
@@ -80,9 +80,9 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
-    answer = await document_summary_generate(document_id, sentences_count)
+    summary = await document_summary_generate(document_id, sentences_count)
 
-    return {"answer": answer}
+    return {"summary": summary}
 
 
 @router.get("/last_document", name="Return last chated document", response_model=Document)
