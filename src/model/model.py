@@ -139,6 +139,8 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
     log.log(logging.DEBUG, "try try spacy")
     # nlp = spacy.load("en_core_web_sm")
     log.log(logging.DEBUG, "load nlp")
+    nlp = en_core_web_sm.__version__
+    log.log(logging.DEBUG, f"print nlp {nlp}")
     nlp = en_core_web_sm.load()
     log.log(logging.DEBUG, "load spacy")
 
