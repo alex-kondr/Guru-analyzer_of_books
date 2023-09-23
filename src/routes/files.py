@@ -73,7 +73,7 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
                                       sentences_count: int = 5,
                                       db: Session = Depends(get_db),
                                       current_user: User = Depends(auth_service.get_current_user)):
-
+    print("start summ by post")
     document = await repository_files.get_document_by_id(document_id=document_id,
                                                          user_id=current_user.id,
                                                          db=db)
