@@ -98,3 +98,7 @@
     right: 5px;
     /*margin-left: 5px;*/
 }
+
+#btn_login {
+    display: none;
+}

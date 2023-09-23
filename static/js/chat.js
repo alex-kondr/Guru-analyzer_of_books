@@ -24,7 +24,6 @@ const send_glyph = document.getElementById("send_glyph");
 const send_spin = document.getElementById("send_spin");
 const work_file = document.getElementById("work_file");
 
-
 function getCurrentTime() {
     const now = new Date();
     const hour = now.getHours();
@@ -93,14 +92,6 @@ async function sendMessage(message_text, doc_id) {
     if (response.ok === true) {
         const answer = await response.json();
         createMessage(answer.answer, false)
-    } else {
-        if (response.status === 401)
-            swal("Not authenticated");
-        else if (response.status === 422)
-            swal("Input data is invalid");
-        else {
-            const error = await response.json();
-            swal(error.detail);
-        }
     }
+    else await error_code_processing(response);
 }
