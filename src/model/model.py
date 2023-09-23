@@ -136,7 +136,7 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
         nlp = spacy.load("en_core_web_sm")
     except IOError:
         log.log(logging.DEBUG, "not spacy")
-        os.system("python3 -m spacy download en_core_web_sm")
+
         log.log(logging.DEBUG, "try core web spacy")
         nlp = spacy.load("en_core_web_sm")
 
