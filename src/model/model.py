@@ -30,10 +30,13 @@ EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
     file_path = str(file_path)
+    print(f"{document_id=}")
     if file_path.lower().endswith(".pdf"):
         print("choice pdf method")
         loader = PyPDFLoader(file_path)
+        print("created loader")
         pages = loader.load_and_split()
+        print("created pages")
 
     elif file_path.lower().endswith(".docx") or file_path.lower().endswith(".doc"):
         word_doc = Document(file_path)
@@ -64,12 +67,15 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         chunk_overlap=64,
         separators=['\n\n', '\n', '(?=>\. )', ' ', '']
     )
+    print("created text_splitter")
 
     # Split the pages into texts as defined above
     texts = text_splitter.split_documents(pages)
+    print("created texts")
 
     # Create/update the vector store
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
+    print("created vector db")
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
     print("saved vector db")
 
