@@ -132,15 +132,10 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
     punctuation = punctuation + '\n'
 
     log.log(logging.DEBUG, "try spacy")
-    try:
-        nlp = spacy.load("en_core_web_sm")
-    except IOError:
-        log.log(logging.DEBUG, "not spacy")
-
-        log.log(logging.DEBUG, "try core web spacy")
-        nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
     doc = nlp(text_load)
+    log.log(logging.DEBUG, "created doc")
 
     word_frequencies = {}
     for word in doc:
@@ -150,12 +145,14 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
                     word_frequencies[word.text] = 1
                 else:
                     word_frequencies[word.text] += 1
-
+    log.log(logging.DEBUG, "created word_frequencies")
     max_frequency = max(word_frequencies.values())
     for word in word_frequencies.keys():
         word_frequencies[word] = word_frequencies[word] / max_frequency
 
+    log.log(logging.DEBUG, "created max_frequency")
     sentence_tokens = list(doc.sents)
+    log.log(logging.DEBUG, "created sentence_tokens")
     sentence_score = {}
     for sent in sentence_tokens:
         for word in sent:
@@ -165,8 +162,12 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
                 else:
                     sentence_score[sent] += word_frequencies[word.text.lower()]
 
+    log.log(logging.DEBUG, "created sentence_score")
     summary = nlargest(sentences_count, sentence_score, key=sentence_score.get)
+    log.log(logging.DEBUG, "created summary")
     summary = [summ.text for summ in summary]
+    log.log(logging.DEBUG, "created summary list")
+    log.log(logging.DEBUG, "try join")
     return "\n".join(summary)
 
 
