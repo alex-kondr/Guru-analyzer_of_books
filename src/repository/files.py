@@ -84,3 +84,14 @@ async def get_last_user_document_id(user_id: int, db: Session) -> int | None:
                         .limit(1).first()
                         )
     return last_chathistory.document_id if last_chathistory else None
+
+
+async def delete_user_documents(user_id: int, db: Session) -> None:
+
+    query = db.query(Document).filter(Document.user_id == user_id)
+
+    documents = query.all()
+
+    for document in documents:
+        await delete_document_by_id(document_id=document.id, user_id=user_id, db=db)
+
