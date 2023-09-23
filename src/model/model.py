@@ -115,7 +115,7 @@ async def answer_generate(document_id: int, question: str) -> Dict:
             "chat_history": results['chat_history']}
 
 
-def document_summary_generate(document_id: int, sentences_count: int = 5):
+async def document_summary_generate(document_id: int, sentences_count: int = 5):
     log = get_logger("test")
     log.log(logging.DEBUG, "start summary")
     print("start summary")
@@ -136,7 +136,12 @@ def document_summary_generate(document_id: int, sentences_count: int = 5):
     punctuation = punctuation + '\n'
 
     log.log(logging.DEBUG, "try spacy")
-    nlp = spacy.load("en_core_web_sm")
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except:
+        log.log(logging.DEBUG, "not spacy")
+        log.log(logging.DEBUG, spacy.errors)
+        return "not load spacy"
     log.log(logging.DEBUG, "created nlp")
 
     doc = nlp(text_load)
