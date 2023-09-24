@@ -36,6 +36,8 @@ nltk.download('stopwords')
 
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
     logger = get_logger("test")
+    logger.log(level=logging.DEBUG, msg="start convert")
+
     file_path = str(file_path)
     if file_path.lower().endswith(".pdf"):
         logger.log(level=logging.DEBUG, msg="create pdf")

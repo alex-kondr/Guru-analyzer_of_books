@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 from typing import Type, List
@@ -6,6 +7,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from fastapi import UploadFile
 
+from src.conf.logger import get_logger
 from src.database.models import Document
 from src.database.models import ChatHistory
 from src.model.model import convert_document_to_vector_db, delete_vector_db
@@ -42,14 +44,15 @@ async def create_document(file: UploadFile, user_id: int, db: Session) -> Docume
 
 
 async def create_document_by_url(url: str, user_id: int, db: Session) -> Document:
-    document = await get_document_by_name(url, user_id, db)
+    document = Document(user_id=user_id, name=url)
+    db.add(document)
+    db.commit()
+    db.refresh(document)
 
-    if not document:
-        document = Document(user_id=user_id, name=url)
-        db.add(document)
-        db.commit()
-        db.refresh(document)
-        await convert_document_to_vector_db(file_path=url, document_id=document.id)
+    logger = get_logger("test")
+    logger.log(level=logging.DEBUG, msg="end save db")
+
+    await convert_document_to_vector_db(file_path=url, document_id=document.id)
 
     return document
 
