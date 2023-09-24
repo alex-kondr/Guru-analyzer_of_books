@@ -149,6 +149,9 @@ async function getHistory(file_id) {
 }
 
 async function showHistory(history) {
+    const chat_tab = document.getElementById("pills-chat-tab");
+    chat_tab.click()
+
     if (history) {
         global_mdg.replaceChildren();
         history.forEach(rec => createHistoryMessage(rec));
@@ -240,4 +243,46 @@ async function DeleteFileFormShow(file_id) {
             modal.hide();
     };
     modal.show();
+}
+
+async function AddUrlFormShow() {
+    const modal_form = document.getElementById("AddUrlForm")
+    const modal = new bootstrap.Modal(modal_form);
+    const url_str = modal_form.querySelector("#url_str")
+    url_str.value = "";
+
+    const submit_btn = modal_form.querySelector(".btn-primary");
+    submit_btn.onclick = async function (e) {
+        e.preventDefault();
+        if (url_str.value === ""){
+            swal("Specify url, please");
+            return;
+        }
+        if (await uploadUrl(url_str.value))
+            modal.hide();
+    };
+    modal.show();
+}
+
+async function uploadUrl(url_str) {
+    const add_url_spin = document.getElementById("add_url_spin");
+    add_url_spin.style.display = "inline-block";
+    const token = localStorage.getItem('accessToken');
+    let result = null;
+    const response = await fetch(`/api/files/url?url=${url_str}`, {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+    });
+    if (response.ok === true) {
+        const saved_url = await response.json();
+        document.querySelector("tbody").append(newTableRow(saved_url));
+        result = true;
+    }
+    else await error_code_processing(response);
+    add_url_spin.style.display = "none";
+    return result
 }

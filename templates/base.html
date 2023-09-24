@@ -21,17 +21,17 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="form-outline mb-4">
-          <label class="control-label" for="user_name">Username</label>
-          <input type="text" class="form-control" id="user_name" autocomplete="off"/>
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="user_name" placeholder="Username" autocomplete="off"/>
+          <label for="user_name">Username</label>
         </div>
-        <div class="form-outline mb-4">
+        <div class="form-floating mb-3">
+          <input type="email" id="user_email" class="form-control" placeholder="Email address" autocomplete="off"/>
           <label class="control-label" for="user_email">Email address</label>
-          <input type="email" id="user_email" class="form-control" autocomplete="off"/>
         </div>
-        <div class="form-outline mb-4">
+        <div class="form-floating mb-3">
+          <input type="password" id="user_pass" class="form-control" placeholder="Password" autocomplete="off"/>
           <label class="control-label" for="user_pass">Password</label>
-          <input type="password" id="user_pass" class="form-control" autocomplete="off"/>
         </div>
       </div>
       <div class="modal-footer">
