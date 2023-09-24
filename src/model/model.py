@@ -7,7 +7,7 @@ from typing import Union, Dict
 import uuid
 
 import nltk
-import en_core_web_sm
+# import en_core_web_sm
 import tiktoken
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
@@ -23,7 +23,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
-from spacy.lang.en.stop_words import STOP_WORDS as spacy_SW
+# from spacy.lang.en.stop_words import STOP_WORDS as spacy_SW
 
 from src.conf.logger import get_logger
 from src.conf.config import settings
@@ -163,39 +163,39 @@ async def get_text_by_document(document_id: int) -> str:
     return text_load
 
 
-async def text_summary_generate_spacy(text: str, sentences_count: int = 5) -> str:
-    sp_stopwords = list(spacy_SW)
-    punctuation = punct
-    punctuation = punctuation + '\n'
-
-    nlp = en_core_web_sm.load()
-    doc = nlp(text)
-    word_frequencies = {}
-    for word in doc:
-        if word.text.lower() not in sp_stopwords:
-            if word.text.lower() not in punctuation:
-                if word.text not in word_frequencies.keys():
-                    word_frequencies[word.text] = 1
-                else:
-                    word_frequencies[word.text] += 1
-
-    max_frequency = max(word_frequencies.values())
-    for word in word_frequencies.keys():
-        word_frequencies[word] = word_frequencies[word] / max_frequency
-
-    sentence_tokens = list(doc.sents)
-    sentence_score = {}
-    for sent in sentence_tokens:
-        for word in sent:
-            if word.text.lower() in word_frequencies.keys():
-                if sent not in sentence_score.keys():
-                    sentence_score[sent] = word_frequencies[word.text.lower()]
-                else:
-                    sentence_score[sent] += word_frequencies[word.text.lower()]
-
-    summary = nlargest(sentences_count, sentence_score, key=sentence_score.get)
-    summary = [summ.text for summ in summary]
-    return "\n".join(summary)
+# async def text_summary_generate_spacy(text: str, sentences_count: int = 5) -> str:
+#     sp_stopwords = list(spacy_SW)
+#     punctuation = punct
+#     punctuation = punctuation + '\n'
+#
+#     nlp = en_core_web_sm.load()
+#     doc = nlp(text)
+#     word_frequencies = {}
+#     for word in doc:
+#         if word.text.lower() not in sp_stopwords:
+#             if word.text.lower() not in punctuation:
+#                 if word.text not in word_frequencies.keys():
+#                     word_frequencies[word.text] = 1
+#                 else:
+#                     word_frequencies[word.text] += 1
+#
+#     max_frequency = max(word_frequencies.values())
+#     for word in word_frequencies.keys():
+#         word_frequencies[word] = word_frequencies[word] / max_frequency
+#
+#     sentence_tokens = list(doc.sents)
+#     sentence_score = {}
+#     for sent in sentence_tokens:
+#         for word in sent:
+#             if word.text.lower() in word_frequencies.keys():
+#                 if sent not in sentence_score.keys():
+#                     sentence_score[sent] = word_frequencies[word.text.lower()]
+#                 else:
+#                     sentence_score[sent] += word_frequencies[word.text.lower()]
+#
+#     summary = nlargest(sentences_count, sentence_score, key=sentence_score.get)
+#     summary = [summ.text for summ in summary]
+#     return "\n".join(summary)
 
 
 async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
