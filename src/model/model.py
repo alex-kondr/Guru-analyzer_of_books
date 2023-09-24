@@ -4,6 +4,7 @@ from heapq import nlargest
 from pathlib import Path
 from string import punctuation as punct
 from typing import Union, Dict
+import uuid
 
 import nltk
 import en_core_web_sm
@@ -34,16 +35,21 @@ nltk.download('stopwords')
 
 
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
+    logger = get_logger("test")
     file_path = str(file_path)
     if file_path.lower().endswith(".pdf"):
+        logger.log(level=logging.DEBUG, msg="create pdf")
+
         loader = PyPDFLoader(file_path)
         pages = loader.load_and_split()
 
     elif file_path.lower().endswith(".docx") or file_path.lower().endswith(".doc"):
+        logger.log(level=logging.DEBUG, msg="create doc")
+
         word_doc = Document(file_path)
         passages = [p.text for p in word_doc.paragraphs]
         content = "\n".join(passages)
-        file_txt_path = constants.VECTOR_DB_PATH / "temp/temp.txt"
+        file_txt_path = constants.VECTOR_DB_PATH / f"temp/{uuid.uuid4()}.txt"
 
         with open(file_txt_path, "w") as f:
             f.write(content)
@@ -53,22 +59,29 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         os.remove(file_txt_path)
 
     elif file_path.lower().endswith(".txt"):
+        logger.log(level=logging.DEBUG, msg="create txt")
+
         loader = TextLoader(file_path)
         pages = loader.load()
 
     elif "http:" in file_path.lower() or "https:" in file_path.lower() or "www." in file_path.lower():
+        logger.log(level=logging.DEBUG, msg="start Selenium")
         loader = SeleniumURLLoader([file_path])
+
+        logger.log(level=logging.DEBUG, msg="end Selenium and load pages")
         pages = loader.load()
 
     else:
         return HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=messages.FILE_TYPE_IS_NOT_SUPPORTED)
 
+    logger.log(level=logging.DEBUG, msg="text split")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1024,
         chunk_overlap=64,
         separators=['\n\n', '\n', '(?=>\. )', ' ', '']
     )
 
+    logger.log(level=logging.DEBUG, msg="texts")
     # Split the pages into texts as defined above
     texts = text_splitter.split_documents(pages)
 
