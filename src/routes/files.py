@@ -62,8 +62,7 @@ async def add_text_by_url(url: str,
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=url))
 
-    # if check_url_exists(url):
-    if True:
+    if check_url_exists(url):
         return await repository_files.create_document_by_url(url, current_user.id, db)
     else:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,

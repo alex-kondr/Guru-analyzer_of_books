@@ -46,9 +46,9 @@ async def create_document_by_url(url: str, user_id: int, db: Session) -> Documen
 
     if not document:
         document = Document(user_id=user_id, name=url)
-        db.add(document)
-        db.commit()
-        db.refresh(document)
+        # db.add(document)
+        # db.commit()
+        # db.refresh(document)
         await convert_document_to_vector_db(file_path=url, document_id=document.id)
 
     return document
