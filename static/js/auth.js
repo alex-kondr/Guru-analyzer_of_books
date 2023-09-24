@@ -28,8 +28,8 @@ async function RegistrationFormShow() {
 async function LogoutUser() {
     localStorage.setItem("accessToken", "");
     localStorage.setItem("refreshToken", "");
-    contentClear();
-
+    if (window.location.pathname === "/chat")
+        contentClear();
     const btn_logout = document.getElementById("btn_logout");
     btn_logout.style.display = "none";
     const btn_login = document.getElementById("btn_login");
@@ -38,8 +38,9 @@ async function LogoutUser() {
 
 function contentClear() {
     global_mdg.replaceChildren();
-    const file_table = document.getElementById("ContactsTable");
-    file_table.replaceChildren();
+    const rows = document.querySelector("tbody");
+    while (rows.rows.length)
+        rows.deleteRow(0);
     work_file.setAttribute("data-bs-id", "");
     work_file.value = "";
 }
