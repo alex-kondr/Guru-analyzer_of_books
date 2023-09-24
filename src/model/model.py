@@ -29,6 +29,8 @@ from src.conf import constants, messages
 
 
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
+nltk.download('punkt')
+nltk.download('stopwords')
 
 
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
@@ -163,9 +165,6 @@ async def text_summary_generate_spacy(text: str, sentences_count: int = 5) -> st
 
 
 async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
-    nltk.download('punkt')
-    nltk.download('stopwords')
-
     punctuation = punct
     punctuation = punctuation + '\n'
 
