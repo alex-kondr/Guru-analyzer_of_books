@@ -1,25 +1,27 @@
 import logging
 import os
+from heapq import nlargest
 from pathlib import Path
+from string import punctuation as punct
 from typing import Union, Dict
 
+import nltk
+import en_core_web_sm
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+from docx import Document
 from fastapi import HTTPException, status
-from langchain.chains.question_answering import load_qa_chain
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import TextLoader
-from langchain.document_loaders import SeleniumURLLoader
-from langchain.memory import ConversationBufferMemory
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
+from langchain.chains.question_answering import load_qa_chain
+from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import SeleniumURLLoader
+from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.memory import ConversationBufferMemory
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from spacy.lang.en.stop_words import STOP_WORDS as spacy_SW
-from string import punctuation as punct
-from heapq import nlargest
-from docx import Document
-
-import en_core_web_sm
 
 from src.conf.logger import get_logger
 from src.conf.config import settings
@@ -125,7 +127,7 @@ async def get_text_by_document(document_id: int) -> str:
     return text_load
 
 
-async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
+async def text_summary_generate_spacy(text: str, sentences_count: int = 5) -> str:
     sp_stopwords = list(spacy_SW)
     punctuation = punct
     punctuation = punctuation + '\n'
@@ -157,6 +159,45 @@ async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
 
     summary = nlargest(sentences_count, sentence_score, key=sentence_score.get)
     summary = [summ.text for summ in summary]
+    return "\n".join(summary)
+
+
+async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
+    nltk.download('punkt')
+    nltk.download('stopwords')
+
+    punctuation = punct
+    punctuation = punctuation + '\n'
+
+    nltk_tokens = word_tokenize(text)
+    sentences_list = sent_tokenize(text)
+
+    nltk_stop_words = set(stopwords.words('english'))
+
+    nltk_word_frequencies = {}
+    for word in nltk_tokens:
+        if word.lower() not in nltk_stop_words:
+            if word.lower() not in punctuation:
+                if word not in nltk_word_frequencies.keys():
+                    nltk_word_frequencies[word] = 1
+                else:
+                    nltk_word_frequencies[word] += 1
+
+    nltk_max_frequency = max(nltk_word_frequencies.values())
+    for word in nltk_word_frequencies.keys():
+        nltk_word_frequencies[word] = nltk_word_frequencies[word] / nltk_max_frequency
+
+    nltk_sentence_score = {}
+    for sent in sentences_list:
+        for word in word_tokenize(sent.lower()):
+            if word.lower() in nltk_word_frequencies.keys():
+                if sent not in nltk_sentence_score.keys():
+                    nltk_sentence_score[sent] = nltk_word_frequencies[word.lower()]
+                else:
+                    nltk_sentence_score[sent] += nltk_word_frequencies[word.lower()]
+
+    summary = nlargest(sentences_count, nltk_sentence_score, key=nltk_sentence_score.get)
+
     return "\n".join(summary)
 
 
