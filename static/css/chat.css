@@ -88,6 +88,11 @@
     display: none;
 }
 
+#add_url_spin {
+    display: none;
+    margin-right: 5px;
+}
+
 #send_spin {
     display: none;
 }

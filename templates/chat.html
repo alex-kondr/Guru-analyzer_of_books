@@ -24,6 +24,32 @@
   </div>
 </div>
 <!-- End Modal for deleting a file-->
+<!-- Modal for adding a url -->
+<div class="modal fade" id="AddUrlForm" tabindex="-1" aria-labelledby="basicModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Adding url</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="url_str" placeholder="Url" autocomplete="off"/>
+          <label for="url_str">Url</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">
+          <i class="spinner-border spinner-border-sm" id="add_url_spin"></i>
+          Add
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal for adding url-->
 
 <div class="chat-body card">
   <div class="card-body" id="chat_box">
@@ -64,7 +90,7 @@
           <div class="input-group" id="chat_input">
             <input type="text" class="form-control" id="msg_input" placeholder="Write your message...">
             <button class="btn btn-outline-secondary" id="btn_submit">
-              <i class="fa fa-sign-out" id="send_glyph"></i>
+              <i class="fa fa-paper-plane" id="send_glyph"></i>
               <i class="spinner-border spinner-border-sm" id="send_spin"></i>
             </button>
           </div>
@@ -85,10 +111,14 @@
                     </div>
                   </form>
                   <div class='d-flex justify-content-end'>
-                    <button class="btn btn-outline-primary text-nowrap" id="btn_add_file"
+                    <button class="btn btn-outline-primary text-nowrap" id="btn_add_url"
+                            onclick="AddUrlFormShow()">
+                      <i class="btn-label"><i class="fa fa-globe" id="add_url_glyph"></i></i> Add url
+                    </button>
+                    <button class="btn btn-outline-primary text-nowrap" style="margin-left: 8px" id="btn_add_file"
                             onclick="uploadFiles()">
                       <i class="spinner-border spinner-border-sm" id="add_file_spin"></i>
-                      <i class="btn-label"><i class="fa fa-file-pdf" id="add_file_glyph"></i></i> Add file
+                      <i class="btn-label"><i class="fa fa-folder-open" id="add_file_glyph"></i></i> Add file
                     </button>
                   </div>
                 </nav>
