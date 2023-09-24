@@ -59,5 +59,13 @@ class UserUpdateModel(BaseModel):
     first_name: str = None
     last_name: str = None
     username: str
-    email: str
-    password: str = Field(min_length=PASSWORD_MIN_LEN, max_length=PASSWORD_MAX_LEN)
+
+    @validator("username")
+    def validate_username(cls, username: str):
+        try:
+            if re.search(r"^[a-zA-Z0-9 _]+$", username):
+                return '@' + username.strip().lower().replace(' ', '_')
+            else:
+                raise ValueError()
+        except ValueError:
+            raise ValueError(f"\"{username}\" - is not a valid username")

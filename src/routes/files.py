@@ -8,7 +8,7 @@ from src.services.auth import auth_service
 from src.services.files import check_url_exists
 from src.repository import files as repository_files
 from src.schemas.files import Document
-from src.schemas.chats import ChatResponse, SummaryResponse
+from src.schemas.chats import SummaryResponse
 from src.model.model import document_summary_generate
 from src.conf import messages
 from src.conf import constants
