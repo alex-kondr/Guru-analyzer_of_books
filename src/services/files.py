@@ -8,5 +8,5 @@ def check_url_exists(url):
             return True
         else:
             return False
-    except requests.ConnectionError:
+    except requests.exceptions.RequestException as e:
         return False
