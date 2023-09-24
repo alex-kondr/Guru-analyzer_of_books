@@ -21,13 +21,11 @@ async def get_document_by_name(name: str, user_id: int, db: Session) -> Document
 
 
 async def create_document(file: UploadFile, user_id: int, db: Session) -> Document:
-
     temp_path = constants.VECTOR_DB_PATH / "temp"
     temp_path.mkdir(exist_ok=True)
 
     document = await get_document_by_name(file.filename, user_id, db)
     if not document:
-
         file_path = temp_path / file.filename
         with open(file_path, "wb") as fh:
             shutil.copyfileobj(file.file, fh)
@@ -77,21 +75,18 @@ async def get_user_documents(search_str: str, user_id: int, db: Session) -> List
 
 
 async def get_last_user_document_id(user_id: int, db: Session) -> int | None:
-
-    last_chathistory = (db.query(ChatHistory)
-                        .filter(ChatHistory.user_id == user_id)
-                        .order_by(desc(ChatHistory.id))
-                        .limit(1).first()
-                        )
-    return last_chathistory.document_id if last_chathistory else None
+    last_chat_history = (db.query(ChatHistory)
+                         .filter(ChatHistory.user_id == user_id)
+                         .order_by(desc(ChatHistory.id))
+                         .limit(1).first()
+                         )
+    return last_chat_history.document_id if last_chat_history else None
 
 
 async def delete_user_documents(user_id: int, db: Session) -> None:
-
     query = db.query(Document).filter(Document.user_id == user_id)
 
     documents = query.all()
 
     for document in documents:
         await delete_document_by_id(document_id=document.id, user_id=user_id, db=db)
-

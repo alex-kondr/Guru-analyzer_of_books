@@ -4,3 +4,4 @@ postgres-data
 /.idea/
 __pycache__
 .vscode/launch.json
+/static/vector_db_path

@@ -23,8 +23,8 @@ import en_core_web_sm
 
 from src.conf.logger import get_logger
 from src.conf.config import settings
-from src.conf import constants
-from src.conf import messages
+from src.conf import constants, messages
+
 
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 
@@ -115,19 +115,23 @@ async def answer_generate(document_id: int, question: str) -> Dict:
             "chat_history": results['chat_history']}
 
 
-async def document_summary_generate(document_id: int, sentences_count: int = 5):
+async def get_text_by_document(document_id: int) -> str:
     vector_db = await load_vector_db(document_id)
     docs = vector_db.similarity_search_with_score('', k=10000)
     text_load = ''
     for i in range(len(docs) - 1):
         text_load += docs[i][0].page_content
 
+    return text_load
+
+
+async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
     sp_stopwords = list(spacy_SW)
     punctuation = punct
     punctuation = punctuation + '\n'
 
     nlp = en_core_web_sm.load()
-    doc = nlp(text_load)
+    doc = nlp(text)
     word_frequencies = {}
     for word in doc:
         if word.text.lower() not in sp_stopwords:
@@ -156,9 +160,6 @@ async def document_summary_generate(document_id: int, sentences_count: int = 5):
     return "\n".join(summary)
 
 
-async def chathistory_summary_generate(document_id: int, chathistory: str, sentences_count: int):
-    vector_db = await load_vector_db(document_id)
-    # TODO реалізувати формування самарі по chathistory
-
-    result = chathistory  # + "\n" + "--- answer will be soon --- " * sentences_count
+async def chat_history_summary_generate(chat_history: str, sentences_count: int = 5) -> str:
+    result = await text_summary_generate(text=chat_history, sentences_count=sentences_count)
     return result
