@@ -25,6 +25,25 @@ async function RegistrationFormShow() {
     modal.show();
 }
 
+async function LogoutUser() {
+    localStorage.setItem("accessToken", "");
+    localStorage.setItem("refreshToken", "");
+    contentClear();
+
+    const btn_logout = document.getElementById("btn_logout");
+    btn_logout.style.display = "none";
+    const btn_login = document.getElementById("btn_login");
+    btn_login.style.display = "inline-block";
+}
+
+function contentClear() {
+    global_mdg.replaceChildren();
+    const file_table = document.getElementById("ContactsTable");
+    file_table.replaceChildren();
+    work_file.setAttribute("data-bs-id", "");
+    work_file.value = "";
+}
+
 async function LoginFormShow() {
 
     const modal_form = document.getElementById("LoginForm")
@@ -77,14 +96,12 @@ async function loginUser() {
             localStorage.setItem('refreshToken', result.refresh_token)
             const btn_login = document.getElementById("btn_login");
             btn_login.style.display = "none";
+            const btn_logout = document.getElementById("btn_logout");
+            btn_logout.style.display = "inline-block";
         }
     }
     else await error_code_processing(response);
     return response.ok
-}
-
-function RememberMeClick(rmCheck) {
-    rmCheck.value = rmCheck.checked ? "1" : "0";
 }
 
 async function checkUser() {
@@ -97,7 +114,11 @@ async function checkUser() {
         }
     });
 
-    if (response.ok !== true) {
+    if (response.ok === true) {
+        const btn_logout = document.getElementById("btn_logout");
+        btn_logout.style.display = "inline-block";
+    }
+    else{
         const btn_login = document.getElementById("btn_login");
         btn_login.style.display = "inline-block";
     }

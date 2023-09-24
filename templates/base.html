@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" charset="UTF-8">
-  <title>MAIN_APP</title>
+  <title>CHAT_ASSISTANT</title>
 
   <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -61,23 +61,13 @@
           <input type="password" class="form-control" id="UserPass" placeholder="Password">
           <label for="UserPass">Password</label>
         </div>
-        <div class="col-12 mt-3">
-          <div class="form-check">
-            <input class="form-check-input" onclick="RememberMeClick(this)" type="checkbox" value="0" id="RememberMe">
-            <label class="form-check-label" for="RememberMe">
-              Remember me
-            </label>
-          </div>
-        </div>
-        <div class="col-12 mt-3">
-          <a href="#" onclick="">Forgot password?</a>
-        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary">Login</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <div class="col-12 text-center mt-3">
-          <p>Not a member? <a href="#" onclick="RegistrationFormShow()">Register</a></p>
+          <button type="button" class="btn btn-outline-secondary" style="border:none;"
+                  onclick="RegistrationFormShow()">Not a member? Register</button>
         </div>
       </div>
     </div>
@@ -114,8 +104,11 @@
   </div>
   <div class="collapse navbar-collapse">
     <ul class="navbar-nav ms-auto">
-      <li class="nav-item" id="btn_login">
-        <a class="nav-link" onclick="LoginFormShow()" href="#">Login</a>
+      <li class="nav-item">
+        <button type="button" class="btn btn-outline-secondary" id="btn_login" style="border:none;"
+                onclick="LoginFormShow()">Login</button>
+        <button type="button" class="btn btn-outline-secondary" id="btn_logout" style="border:none;"
+                onclick="LogoutUser()">Logout</button>
       </li>
     </ul>
   </div>
