@@ -8,6 +8,7 @@ import uuid
 
 import nltk
 import en_core_web_sm
+import tiktoken
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 from docx import Document
@@ -28,13 +29,26 @@ from src.conf.logger import get_logger
 from src.conf.config import settings
 from src.conf import constants, messages
 
-
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 nltk.download('punkt')
 nltk.download('stopwords')
 
 
-async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | None:
+def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+
+    price = 0.0001  # 0.0001 USD per 1000 tokens
+    token_summary = {
+        '1K/tokens': num_tokens / 1000,
+        '$price 1K/tokens': price,
+        'Total_cost(USD)': num_tokens / 1000 * price
+    }
+    return token_summary
+
+
+async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | Dict:
     logger = get_logger("test")
     logger.log(level=logging.DEBUG, msg="start convert")
 
@@ -90,6 +104,11 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
     # Create/update the vector store
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
+
+    full_text = ""
+    for i in range(len(texts) - 1):
+        full_text += texts[i].page_content
+    return get_token_summary(full_text)
 
 
 async def load_vector_db(document_id: int):
