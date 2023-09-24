@@ -9,7 +9,7 @@ from src.services.files import check_url_exists
 from src.repository import files as repository_files
 from src.schemas.files import Document
 from src.schemas.chats import SummaryResponse
-from src.model.model import document_summary_generate
+from src.model.model import get_text_by_document, text_summary_generate
 from src.conf import messages
 from src.conf import constants
 
@@ -19,7 +19,6 @@ router = APIRouter(prefix="/files", tags=["files"])
 @router.get("/", name="Return all user's files", response_model=List[Document])
 async def get_files(search_str: str = None, db: Session = Depends(get_db),
                     current_user: User = Depends(auth_service.get_current_user)):
-
     documents = await repository_files.get_user_documents(search_str=search_str,
                                                           user_id=current_user.id,
                                                           db=db)
@@ -27,7 +26,6 @@ async def get_files(search_str: str = None, db: Session = Depends(get_db),
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENTS_NOT_FOUND)
 
     return documents
-
 
 
 @router.post("/doc",
@@ -75,7 +73,6 @@ async def add_text_by_url(url: str,
 async def delete_file(document_id: int = Path(ge=1),
                       db: Session = Depends(get_db),
                       current_user: User = Depends(auth_service.get_current_user)):
-
     document = await repository_files.get_document_by_id(document_id=document_id,
                                                          user_id=current_user.id,
                                                          db=db)
@@ -96,7 +93,8 @@ async def make_summary_by_document_id(document_id: int = Path(ge=1),
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
-    summary = await document_summary_generate(document_id, sentences_count)
+    text_by_document = await get_text_by_document(document_id=document_id)
+    summary = await text_summary_generate(text=text_by_document, sentences_count=sentences_count)
     return {"summary": summary}
 
 
