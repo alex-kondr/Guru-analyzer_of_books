@@ -5,7 +5,6 @@ WORKDIR /app
 COPY src /app/src
 COPY static /app/static
 COPY templates /app/templates
-COPY driver /app/driver
 COPY main.py /app
 COPY requirements.txt /app
 
