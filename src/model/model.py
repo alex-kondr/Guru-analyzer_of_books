@@ -3,8 +3,11 @@ import os
 from heapq import nlargest
 from pathlib import Path
 from string import punctuation as punct
-from typing import Union, Dict
+from typing import Union, Dict, List
 import uuid
+
+import langchain.schema
+from unstructured.partition.html import partition_html
 
 import nltk
 import tiktoken
@@ -17,6 +20,7 @@ from langchain.chains import RetrievalQA
 from langchain.chains.question_answering import load_qa_chain
 from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import SeleniumURLLoader
+from langchain.schema.document import Document
 from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
@@ -24,8 +28,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from selenium import webdriver
 import chromedriver_binary
-# from selenium.webdriver.chrome.service import Service as ChromeService
-# from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 from src.conf.logger import get_logger
@@ -36,7 +40,7 @@ EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 nltk.download('punkt')
 nltk.download('stopwords')
 # driver = webdriver.Chrome()
-# driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 
 def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:
@@ -87,10 +91,24 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
 
     elif "http:" in file_path.lower() or "https:" in file_path.lower() or "www." in file_path.lower():
         logger.log(level=logging.DEBUG, msg="start Selenium")
-        loader = SeleniumURLLoader([file_path])
+        # loader = SeleniumURLLoader([file_path])
+
+        pages: List[Document] = list()
+        try:
+            driver.get(file_path)
+            page_content = driver.page_source
+            elements = partition_html(text=page_content)
+            text = "\n\n".join([str(el) for el in elements])
+            metadata = {"source": page_content}
+            pages.append(Document(page_content=text, metadata=metadata))
+        except Exception as e:
+            logger.error(f"Error fetching or processing {file_path}, exception: {e}")
+
+        driver.quit()
+        # return docs
 
         logger.log(level=logging.DEBUG, msg="end Selenium and load pages")
-        pages = loader.load()
+        # pages = loader.load()
 
     else:
         return HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=messages.FILE_TYPE_IS_NOT_SUPPORTED)
