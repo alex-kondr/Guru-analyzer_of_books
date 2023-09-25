@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from src.database.models import ChatHistory
 
 
-async def get_chat_by_document_id(document_id: int, user_id: int, last_question_count: int,
-                                  db: Session) -> list[Type[ChatHistory]]:
+async def get_chat_by_document_id(document_id: int, user_id: int, db: Session,
+                                  last_question_count: int = None) -> list[Type[ChatHistory]]:
 
     query = db.query(ChatHistory).filter(ChatHistory.document_id == document_id,
                                          ChatHistory.user_id == user_id).order_by(desc(ChatHistory.id))

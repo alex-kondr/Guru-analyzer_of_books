@@ -15,28 +15,20 @@ from fastapi import HTTPException, status
 from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
 from langchain.chains.question_answering import load_qa_chain
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import SeleniumURLLoader
-from langchain.document_loaders import TextLoader
+from langchain.document_loaders import PyPDFLoader, TextLoader, WebBaseLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
-from selenium import webdriver
-import chromedriver_binary
-# from selenium.webdriver.chrome.service import Service as ChromeService
-# from webdriver_manager.chrome import ChromeDriverManager
-
 
 from src.conf.logger import get_logger
 from src.conf.config import settings
 from src.conf import constants, messages
 
+
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 nltk.download('punkt')
 nltk.download('stopwords')
-# driver = webdriver.Chrome()
-# driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 
 def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:
@@ -54,19 +46,12 @@ def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:
 
 
 async def convert_document_to_vector_db(file_path: Union[str, Path], document_id: int) -> HTTPException | Dict:
-    logger = get_logger("test")
-    logger.log(level=logging.DEBUG, msg="start convert")
-
     file_path = str(file_path)
     if file_path.lower().endswith(".pdf"):
-        logger.log(level=logging.DEBUG, msg="create pdf")
-
         loader = PyPDFLoader(file_path)
         pages = loader.load_and_split()
 
     elif file_path.lower().endswith(".docx") or file_path.lower().endswith(".doc"):
-        logger.log(level=logging.DEBUG, msg="create doc")
-
         word_doc = Document(file_path)
         passages = [p.text for p in word_doc.paragraphs]
         content = "\n".join(passages)
@@ -80,29 +65,22 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
         os.remove(file_txt_path)
 
     elif file_path.lower().endswith(".txt"):
-        logger.log(level=logging.DEBUG, msg="create txt")
-
         loader = TextLoader(file_path)
         pages = loader.load()
 
     elif "http:" in file_path.lower() or "https:" in file_path.lower() or "www." in file_path.lower():
-        logger.log(level=logging.DEBUG, msg="start Selenium")
-        loader = SeleniumURLLoader([file_path])
-
-        logger.log(level=logging.DEBUG, msg="end Selenium and load pages")
+        loader = WebBaseLoader(web_path=file_path)
         pages = loader.load()
 
     else:
         return HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail=messages.FILE_TYPE_IS_NOT_SUPPORTED)
 
-    logger.log(level=logging.DEBUG, msg="text split")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1024,
         chunk_overlap=64,
         separators=['\n\n', '\n', '(?=>\. )', ' ', '']
     )
 
-    logger.log(level=logging.DEBUG, msg="texts")
     # Split the pages into texts as defined above
     texts = text_splitter.split_documents(pages)
 
@@ -168,42 +146,7 @@ async def get_text_by_document(document_id: int) -> str:
     return text_load
 
 
-# async def text_summary_generate_spacy(text: str, sentences_count: int = 5) -> str:
-#     sp_stopwords = list(spacy_SW)
-#     punctuation = punct
-#     punctuation = punctuation + '\n'
-#
-#     nlp = en_core_web_sm.load()
-#     doc = nlp(text)
-#     word_frequencies = {}
-#     for word in doc:
-#         if word.text.lower() not in sp_stopwords:
-#             if word.text.lower() not in punctuation:
-#                 if word.text not in word_frequencies.keys():
-#                     word_frequencies[word.text] = 1
-#                 else:
-#                     word_frequencies[word.text] += 1
-#
-#     max_frequency = max(word_frequencies.values())
-#     for word in word_frequencies.keys():
-#         word_frequencies[word] = word_frequencies[word] / max_frequency
-#
-#     sentence_tokens = list(doc.sents)
-#     sentence_score = {}
-#     for sent in sentence_tokens:
-#         for word in sent:
-#             if word.text.lower() in word_frequencies.keys():
-#                 if sent not in sentence_score.keys():
-#                     sentence_score[sent] = word_frequencies[word.text.lower()]
-#                 else:
-#                     sentence_score[sent] += word_frequencies[word.text.lower()]
-#
-#     summary = nlargest(sentences_count, sentence_score, key=sentence_score.get)
-#     summary = [summ.text for summ in summary]
-#     return "\n".join(summary)
-
-
-async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
+async def text_summary_generate(text: str, sentences_count: int = constants.DEFAULT_SUMMARY_SENTENCES_COUNT) -> str:
     punctuation = punct
     punctuation = punctuation + '\n'
 
@@ -239,6 +182,7 @@ async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
     return "\n".join(summary)
 
 
-async def chat_history_summary_generate(chat_history: str, sentences_count: int = 5) -> str:
+async def chat_history_summary_generate(chat_history: str,
+                                        sentences_count: int = constants.DEFAULT_SUMMARY_SENTENCES_COUNT) -> str:
     result = await text_summary_generate(text=chat_history, sentences_count=sentences_count)
     return result
