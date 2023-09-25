@@ -16,9 +16,7 @@ from fastapi import HTTPException, status
 from langchain import HuggingFaceHub
 from langchain.chains import RetrievalQA
 from langchain.chains.question_answering import load_qa_chain
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import SeleniumURLLoader
-from langchain.document_loaders import TextLoader
+from langchain.document_loaders import PyPDFLoader, SeleniumURLLoader, TextLoader, WebBaseLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -89,7 +87,8 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
 
     elif "http:" in file_path.lower() or "https:" in file_path.lower() or "www." in file_path.lower():
         logger.log(level=logging.DEBUG, msg="start Selenium")
-        loader = SeleniumURLLoader([file_path], binary_location="driver/chromedriver")
+        loader = WebBaseLoader(web_path=file_path)
+        # loader = SeleniumURLLoader([file_path], binary_location="driver/chromedriver.exe")
 
         logger.log(level=logging.DEBUG, msg="end Selenium and load pages")
         pages = loader.load()
