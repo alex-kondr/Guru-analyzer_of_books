@@ -5,12 +5,9 @@ WORKDIR /app
 COPY src /app/src
 COPY static /app/static
 COPY templates /app/templates
-COPY geckodriver /app/geckodriver
+COPY driver /app/driver
 COPY main.py /app
 COPY requirements.txt /app
-
-RUN chmod +x /app/geckodriver
-RUN export PATH=$PATH:/app/geckodriver
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /app/requirements.txt
