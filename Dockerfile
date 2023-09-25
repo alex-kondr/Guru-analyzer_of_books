@@ -11,7 +11,7 @@ COPY requirements.txt /app
 
 RUN chmod +x /app/geckodriver
 RUN export PATH=$PATH:/app/geckodriver
-RUN geckodriver -V
+RUN /app/geckodriver/geckodriver -V
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /app/requirements.txt
