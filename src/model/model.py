@@ -82,7 +82,7 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
 
     elif "http:" in file_path.lower() or "https:" in file_path.lower() or "www." in file_path.lower():
         logger.log(level=logging.DEBUG, msg="start Selenium")
-        loader = SeleniumURLLoader([file_path], browser="firefox")
+        loader = SeleniumURLLoader([file_path])
 
         logger.log(level=logging.DEBUG, msg="end Selenium and load pages")
         pages = loader.load()
