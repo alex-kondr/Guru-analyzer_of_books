@@ -23,3 +23,6 @@ VECTOR_DB_PATH = STATIC / "vector_db_path"
 VECTOR_DB_PATH.mkdir(exist_ok=True)
 
 ALLOWED_FILES_EXTENSIONS = ['.pdf', '.txt', '.doc', '.docx']
+
+DEFAULT_LAST_ANSWERS_COUNT = 20
+DEFAULT_SUMMARY_SENTENCES_COUNT = 5
