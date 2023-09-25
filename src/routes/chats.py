@@ -62,11 +62,13 @@ async def ask_question(body: ChatQuestion,
 
 
 @router.post("/summary", name="Make last answers summary", response_model=ChatResponse)
-async def make_chathistory_summary_by_document_id(last_question_count: int = None,
-                                                  sentences_count: int = 5,
-                                                  db: Session = Depends(get_db),
-                                                  current_user: User = Depends(auth_service.get_current_user)):
-    last_document_id = await repository_files.get_last_user_document_id(user_id=current_user.id,
+async def make_chat_history_summary_by_document_id(last_question_count: int = None,
+                                                   document_id: int = None,
+                                                   sentences_count: int = 5,
+                                                   db: Session = Depends(get_db),
+                                                   current_user: User = Depends(auth_service.get_current_user)):
+
+    last_document_id = document_id or await repository_files.get_last_user_document_id(user_id=current_user.id,
                                                                         db=db)
     if last_document_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
