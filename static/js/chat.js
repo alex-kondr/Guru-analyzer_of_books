@@ -18,6 +18,7 @@ const global_mdg = document.getElementById("messages")
 const btn_submit = document.getElementById("btn_submit");
 const btn_search = document.getElementById("btn_search");
 const btn_history = document.getElementById("btn_history");
+const btn_summary = document.getElementById("btn_summary");
 const query = document.getElementById("msg_input");
 
 const send_glyph = document.getElementById("send_glyph");

@@ -245,11 +245,21 @@ async function DeleteFileFormShow(file_id) {
     modal.show();
 }
 
-async function AddUrlFormShow() {
+const url_modal_form = document.getElementById("AddUrlForm");
+url_modal_form.addEventListener("hide.bs.modal", async function() {
+    const hidden_url_str = url_modal_form.querySelector("#hidden_url_str");
+    if (hidden_url_str.value !== "") {
+        await uploadUrl(hidden_url_str.value);
+    }
+});
+
+function AddUrlFormShow() {
     const modal_form = document.getElementById("AddUrlForm")
     const modal = new bootstrap.Modal(modal_form);
     const url_str = modal_form.querySelector("#url_str")
+    const hidden_url_str = modal_form.querySelector("#hidden_url_str")
     url_str.value = "";
+    hidden_url_str.value = "";
 
     const submit_btn = modal_form.querySelector(".btn-primary");
     submit_btn.onclick = async function (e) {
@@ -258,14 +268,16 @@ async function AddUrlFormShow() {
             swal("Specify url, please");
             return;
         }
-        if (await uploadUrl(url_str.value))
-            modal.hide();
+        else hidden_url_str.value = url_str.value;
+        modal.hide();
     };
     modal.show();
 }
 
 async function uploadUrl(url_str) {
     const add_url_spin = document.getElementById("add_url_spin");
+    const add_url_glyph = document.getElementById("add_url_glyph");
+    add_url_glyph.style.display = "none";
     add_url_spin.style.display = "inline-block";
     const token = localStorage.getItem('accessToken');
     let result = null;
@@ -284,5 +296,65 @@ async function uploadUrl(url_str) {
     }
     else await error_code_processing(response);
     add_url_spin.style.display = "none";
+    add_url_glyph.style.display = "inline-block";
     return result
 }
+
+btn_summary.onclick = async function (e) {
+    e.preventDefault();
+    let doc_id = work_file.getAttribute("data-bs-id");
+    if (doc_id === "") {
+        const last_doc = await getLastFile();
+        doc_id = last_doc.id;
+        work_file.setAttribute("data-bs-id", last_doc.id);
+        work_file.value = last_doc.name;
+    }
+    if (doc_id !== "") {
+        const summary = await getSummary(doc_id);
+        await showSummary(summary.answer)
+    }
+}
+
+async function getSummary(file_id) {
+    const url = `/api/chats/summary/?document_id=${file_id}`
+    const token = localStorage.getItem('accessToken');
+    let summary = null
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    });
+
+    if (response.ok === true)
+        summary = await response.json();
+    else await error_code_processing(response);
+
+    return summary;
+}
+
+async function showSummary(summary_text) {
+    const chat_tab = document.getElementById("pills-chat-tab");
+    chat_tab.click()
+    if (summary_text) {
+        printSummary(summary_text)
+        global_mdg.scrollTop = global_mdg.scrollHeight;
+    }
+}
+
+function printSummary(summary_text) {
+    const summaryContent = document.createElement("div");
+    summaryContent.classList.add("summary-content");
+    summaryContent.textContent = summary_text;
+
+    const summaryFooter = document.createElement('div');
+    summaryFooter.classList.add('summary');
+    summaryFooter.textContent = "SUMMARY";
+    summaryContent.appendChild(summaryFooter);
+    global_mdg.appendChild(summaryContent);
+}
+
+
+

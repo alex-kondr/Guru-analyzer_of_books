@@ -30,18 +30,18 @@
   <div class="modal-dialog modal-md">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5">Adding url</h1>
+        <h1 class="modal-title fs-5">Url</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="form-floating">
-          <input type="text" class="form-control" id="url_str" placeholder="Url" autocomplete="off"/>
+          <input type="text" class="form-control" id="url_str" placeholder="Your url" autocomplete="off"/>
           <label for="url_str">Url</label>
+          <input type="hidden" id="hidden_url_str"/>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary">
-          <i class="spinner-border spinner-border-sm" id="add_url_spin"></i>
           Add
         </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -113,6 +113,7 @@
                   <div class='d-flex justify-content-end'>
                     <button class="btn btn-outline-primary text-nowrap" id="btn_add_url"
                             onclick="AddUrlFormShow()">
+                      <i class="spinner-border spinner-border-sm" id="add_url_spin"></i>
                       <i class="btn-label"><i class="fa fa-globe" id="add_url_glyph"></i></i> Add url
                     </button>
                     <button class="btn btn-outline-primary text-nowrap" style="margin-left: 8px" id="btn_add_file"
