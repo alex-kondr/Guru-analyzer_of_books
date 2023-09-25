@@ -12,13 +12,14 @@ from src.repository import chats as repository_chats
 from src.repository import files as repository_files
 from src.model.model import answer_generate, chat_history_summary_generate
 from src.conf import messages
+from src.conf import constants
 
 router = APIRouter(prefix="/chats", tags=["chats"])
 
 
 @router.get("/", name="Return all chat history for document", response_model=List[ChatHistoryResponse])
 async def read_chat_by_document_id(document_id: int,
-                                   last_question_count: int = 20,
+                                   last_question_count: int = constants.DEFAULT_LAST_ANSWERS_COUNT,
                                    db: Session = Depends(get_db),
                                    current_user: User = Depends(auth_service.get_current_user)):
     document = await repository_files.get_document_by_id(document_id=document_id,
@@ -29,8 +30,8 @@ async def read_chat_by_document_id(document_id: int,
 
     chat_history = await repository_chats.get_chat_by_document_id(document_id=document_id,
                                                                   user_id=current_user.id,
-                                                                  last_question_count=last_question_count,
-                                                                  db=db)
+                                                                  db=db,
+                                                                  last_question_count=last_question_count)
 
     if not chat_history:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_CHATHISTORY_NOT_FOUND)
@@ -64,12 +65,12 @@ async def ask_question(body: ChatQuestion,
 @router.post("/summary", name="Make last answers summary", response_model=ChatResponse)
 async def make_chat_history_summary_by_document_id(last_question_count: int = None,
                                                    document_id: int = None,
-                                                   sentences_count: int = 5,
+                                                   sentences_count: int = constants.DEFAULT_SUMMARY_SENTENCES_COUNT,
                                                    db: Session = Depends(get_db),
                                                    current_user: User = Depends(auth_service.get_current_user)):
 
     last_document_id = document_id or await repository_files.get_last_user_document_id(user_id=current_user.id,
-                                                                        db=db)
+                                                                                       db=db)
     if last_document_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
 
@@ -81,8 +82,8 @@ async def make_chat_history_summary_by_document_id(last_question_count: int = No
 
     chat_history = await repository_chats.get_chat_by_document_id(document_id=last_document_id,
                                                                   user_id=current_user.id,
-                                                                  last_question_count=last_question_count,
-                                                                  db=db)
+                                                                  db=db,
+                                                                  last_question_count=last_question_count)
 
     history_answers = [chat.answer for chat in chat_history]
 

@@ -205,7 +205,7 @@ async def get_text_by_document(document_id: int) -> str:
 #     return "\n".join(summary)
 
 
-async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
+async def text_summary_generate(text: str, sentences_count: int = constants.DEFAULT_SUMMARY_SENTENCES_COUNT) -> str:
     punctuation = punct
     punctuation = punctuation + '\n'
 
@@ -241,6 +241,7 @@ async def text_summary_generate(text: str, sentences_count: int = 5) -> str:
     return "\n".join(summary)
 
 
-async def chat_history_summary_generate(chat_history: str, sentences_count: int = 5) -> str:
+async def chat_history_summary_generate(chat_history: str,
+                                        sentences_count: int = constants.DEFAULT_SUMMARY_SENTENCES_COUNT) -> str:
     result = await text_summary_generate(text=chat_history, sentences_count=sentences_count)
     return result

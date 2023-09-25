@@ -84,7 +84,7 @@ async def delete_file(document_id: int = Path(ge=1),
 
 @router.post("/summary/{document_id}", name="Make document summary", response_model=SummaryResponse)
 async def make_summary_by_document_id(document_id: int = Path(ge=1),
-                                      sentences_count: int = 5,
+                                      sentences_count: int = constants.DEFAULT_SUMMARY_SENTENCES_COUNT,
                                       db: Session = Depends(get_db),
                                       current_user: User = Depends(auth_service.get_current_user)):
     document = await repository_files.get_document_by_id(document_id=document_id,
