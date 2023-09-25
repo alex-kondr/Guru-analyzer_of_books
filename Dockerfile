@@ -8,6 +8,12 @@ COPY templates /app/templates
 COPY main.py /app
 COPY requirements.txt /app
 
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz
+RUN tar -xzvf geckodriver-v0.32.0-linux64.tar.gz -C /app/bin/geckodriver
+RUN chmod +x /app/bin/geckodriver
+RUN export PATH=$PATH:/app/bin/geckodriver/
+RUN geckodriver -V
+
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
