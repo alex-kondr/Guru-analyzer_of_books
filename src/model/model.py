@@ -26,11 +26,17 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
-from selenium import webdriver
-import chromedriver_binary
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
+# from selenium import webdriver
+# import chromedriver_binary
+# from selenium.webdriver.chrome.service import Service as ChromeService
+# from webdriver_manager.chrome import ChromeDriverManager
 
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromiumService
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
+
+driver = webdriver.Chrome(service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
 
 from src.conf.logger import get_logger
 from src.conf.config import settings
@@ -40,7 +46,7 @@ EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 nltk.download('punkt')
 nltk.download('stopwords')
 # driver = webdriver.Chrome()
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+# driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 
 def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:

@@ -28,7 +28,6 @@ unstructured = "^0.10.15"
 jinja2 = "^3.1.2"
 webdriver-manager = "^4.0.0"
 setuptools = "^68.2.2"
-chromedriver-binary = "^119.0.6028.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest-mock = "^3.10.0"
