@@ -10,7 +10,7 @@ COPY main.py /app
 COPY requirements.txt /app
 
 RUN chmod +x /app/geckodriver
-RUN export PATH=$PATH:/app/geckodriver/
+RUN export PATH=$PATH:/app/geckodriver
 RUN geckodriver -V
 
 RUN pip install --upgrade pip
