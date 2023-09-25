@@ -7,7 +7,6 @@ from typing import Union, Dict
 import uuid
 
 import nltk
-# import en_core_web_sm
 import tiktoken
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
@@ -23,7 +22,11 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
-# from spacy.lang.en.stop_words import STOP_WORDS as spacy_SW
+from selenium import webdriver
+import chromedriver_binary
+# from selenium.webdriver.chrome.service import Service as ChromeService
+# from webdriver_manager.chrome import ChromeDriverManager
+
 
 from src.conf.logger import get_logger
 from src.conf.config import settings
@@ -32,6 +35,8 @@ from src.conf import constants, messages
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 nltk.download('punkt')
 nltk.download('stopwords')
+# driver = webdriver.Chrome()
+# driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 
 def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:
