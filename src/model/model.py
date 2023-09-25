@@ -34,6 +34,13 @@ nltk.download('punkt')
 nltk.download('stopwords')
 
 
+from selenium import webdriver
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
+webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+
+
 def get_token_summary(string: str, encoding_name: str = "cl100k_base") -> dict:
     """Returns the number of tokens in a text string."""
     encoding = tiktoken.get_encoding(encoding_name)
