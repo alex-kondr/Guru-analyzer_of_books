@@ -25,6 +25,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     name = Column(String, nullable=False)
+    tokens_count = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 

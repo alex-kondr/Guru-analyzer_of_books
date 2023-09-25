@@ -118,7 +118,7 @@ async def answer_generate(document_id: int, question: str) -> Dict:
     vector_db = await load_vector_db(document_id)
 
     llm = HuggingFaceHub(huggingfacehub_api_token=settings.huggingfacehub_api_token,
-                         repo_id="tiiuae/falcon-7b",
+                         repo_id="tiiuae/falcon-7b-instruct",
                          model_kwargs={"temperature": 0.5,
                                        "max_length": 512,
                                        "max_new_tokens": 200
