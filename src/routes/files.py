@@ -42,6 +42,10 @@ async def add_file(file: UploadFile,
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=file.filename))
 
+    if await repository_files.get_remaining_user_token_limit(user_id=current_user.id, db=db) <= 0:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=messages.LIMIT_HAS_BEEN_REACHED)
+
     file_extension = "." + file.filename.split(".")[-1].lower()
 
     if file_extension not in constants.ALLOWED_FILES_EXTENSIONS:
@@ -61,6 +65,10 @@ async def add_text_by_url(url: str,
     if document:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=messages.DOCUMENT_IS_EXIST_ALREADY.format(doc_name=url))
+
+    if await repository_files.get_remaining_user_token_limit(user_id=current_user.id, db=db) <= 0:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=messages.LIMIT_HAS_BEEN_REACHED)
 
     if check_url_exists(url):
         return await repository_files.create_document_by_url(url, current_user.id, db)
