@@ -116,3 +116,9 @@ async def get_last_document(db: Session = Depends(get_db),
                                                          db=db)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.DOCUMENT_NOT_FOUND)
+
+
+@router.get("/limit_reached", name="Return True if token limit has been reached", response_model=bool)
+async def get_limit_reached(db: Session = Depends(get_db),
+                            current_user: User = Depends(auth_service.get_current_user)):
+    return await repository_files.get_remaining_user_token_limit(user_id=current_user.id, db=db) <= 0
