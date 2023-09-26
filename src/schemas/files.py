@@ -12,6 +12,7 @@ class DocumentModel(BaseModel):
 class Document(BaseModel):
     id: int
     name: str
+    tokens_count: int
     created_at: datetime
     updated_at: datetime
 
