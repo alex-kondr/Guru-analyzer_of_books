@@ -1,9 +1,10 @@
 import logging
 import os
 import shutil
+from datetime import datetime
 from typing import Type, List
 
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 from fastapi import UploadFile
 
@@ -37,7 +38,11 @@ async def create_document(file: UploadFile, user_id: int, db: Session) -> Docume
         db.commit()
         db.refresh(document)
 
-        await convert_document_to_vector_db(file_path=file_path, document_id=document.id)
+        tokens = await convert_document_to_vector_db(file_path=file_path, document_id=document.id)
+        document.tokens_count = tokens['1K/tokens']
+        db.commit()
+        db.refresh(document)
+
         os.remove(file_path)
 
     return document
@@ -52,7 +57,10 @@ async def create_document_by_url(url: str, user_id: int, db: Session) -> Documen
     logger = get_logger("test")
     logger.log(level=logging.DEBUG, msg="end save db")
 
-    await convert_document_to_vector_db(file_path=url, document_id=document.id)
+    tokens = await convert_document_to_vector_db(file_path=url, document_id=document.id)
+    document.tokens_count = tokens['1K/tokens']
+    db.commit()
+    db.refresh(document)
 
     return document
 
@@ -75,6 +83,15 @@ async def get_user_documents(search_str: str, user_id: int, db: Session) -> List
     query = query.order_by(desc(Document.id))
 
     return query.all()
+
+
+async def get_remaining_user_token_limit(user_id: int, db: Session) -> int:
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    used_tokens = db.query(func.sum(Document.tokens_count)).filter(Document.created_at >= today_start,
+                                                                   Document.user_id == user_id).scalar()
+    if used_tokens:
+        return constants.USER_TOKENS_COUNT_LIMIT - used_tokens
+    return constants.USER_TOKENS_COUNT_LIMIT
 
 
 async def get_last_user_document_id(user_id: int, db: Session) -> int | None:
