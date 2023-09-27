@@ -1,13 +1,20 @@
 function newTableRow(file) {
     let tr = document.createElement("tr");
     tr.setAttribute("data-rowid", file.id);
+
     let td = document.createElement("td");
     td.className = "text-end";
     td.innerHTML = file.id;
     tr.append(td);
+
     td = document.createElement("td");
     td.className = "text-start";
     td.innerHTML = file.name;
+    tr.append(td);
+
+    td = document.createElement("td");
+    td.className = "text-end";
+    td.innerHTML = file.tokens_count;
     tr.append(td);
 
     td = document.createElement("td");
@@ -39,23 +46,29 @@ function newTableRow(file) {
     return tr;
 }
 
-async function uploadFiles() {
-    const add_file_spin = document.getElementById("add_file_spin");
-    const add_file_glyph = document.getElementById("add_file_glyph");
+async function btnAddFileClick(){
+    const limit_reached = await checkLimitReached();
+    if (!limit_reached) await uploadFiles();
+}
 
+async function uploadFiles() {
     let input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("multiple", "");
+    input.setAttribute("accept", ".pdf, .doc, .docx, .txt");
     input.onchange = async _ => {
-        add_file_glyph.style.display = "none";
-        add_file_spin.style.display = "inline-block";
+        app_spinner.style.display = "inline-block";
         try {
             let files = Array.from(input.files);
+            let limit_reached = false;
             let result;
             let created_files = [];
             for (let i = 0; i < files.length; i++) {
                 result = await sendFile(files[i])
                 if (result) created_files.push(result)
+                if (i !== (files.length - 1))
+                    limit_reached = await checkLimitReached();
+                if (limit_reached) break;
             }
             if (created_files.length) {
                 for (let i = 0; i < created_files.length; i++) {
@@ -63,8 +76,7 @@ async function uploadFiles() {
                 }
             }
         } finally {
-            add_file_glyph.style.display = "inline-block";
-            add_file_spin.style.display = "none";
+            app_spinner.style.display = "none";
         }
     };
     input.click();
@@ -186,7 +198,13 @@ function printMessage(msg) {
 btn_search.onclick = async function (e) {
     e.preventDefault();
     let filter_str = document.getElementById("filter_str").value;
-    await getFiles(filter_str)
+    app_spinner.style.display = "inline-block";
+    try {
+        await getFiles(filter_str);
+    }
+    finally {
+        app_spinner.style.display = "none";
+    }
 }
 
 async function getFiles(filter_str) {
@@ -253,6 +271,11 @@ url_modal_form.addEventListener("hide.bs.modal", async function() {
     }
 });
 
+async function btnAddUrlClick(){
+    const limit_reached = await checkLimitReached();
+    if (!limit_reached) AddUrlFormShow();
+}
+
 function AddUrlFormShow() {
     const modal_form = document.getElementById("AddUrlForm")
     const modal = new bootstrap.Modal(modal_form);
@@ -275,10 +298,7 @@ function AddUrlFormShow() {
 }
 
 async function uploadUrl(url_str) {
-    const add_url_spin = document.getElementById("add_url_spin");
-    const add_url_glyph = document.getElementById("add_url_glyph");
-    add_url_glyph.style.display = "none";
-    add_url_spin.style.display = "inline-block";
+    app_spinner.style.display = "inline-block";
     const token = localStorage.getItem('accessToken');
     let result = null;
     const response = await fetch(`/api/files/url?url=${url_str}`, {
@@ -295,8 +315,7 @@ async function uploadUrl(url_str) {
         result = true;
     }
     else await error_code_processing(response);
-    add_url_spin.style.display = "none";
-    add_url_glyph.style.display = "inline-block";
+    app_spinner.style.display = "none";
     return result
 }
 
@@ -356,5 +375,26 @@ function printSummary(summary_text) {
     global_mdg.appendChild(summaryContent);
 }
 
+async function checkLimitReached() {
+    const url = "/api/files/limit_reached"
+    const token = localStorage.getItem('accessToken');
+    let limit_reached = null;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    });
+    if (response.ok === true) {
+        limit_reached = await response.json();
+        if (limit_reached)
+            swal("Tokens limit has been reached. You can upload your documents tomorrow");
+    }
+    else {
+        await error_code_processing(response);
+    }
+    return limit_reached;
+}
 
 
