@@ -12,7 +12,6 @@ from src.conf.logger import get_logger
 from src.conf import constants
 from src.database.models import Document, ChatHistory
 from src.model.model import convert_document_to_vector_db, delete_vector_db
-from src.services import cloud_storage
 
 
 async def get_document_by_id(document_id: int, user_id: int, db: Session) -> Document | None:
@@ -58,9 +57,6 @@ async def create_document_by_url(url: str, user_id: int, db: Session) -> Documen
     document.tokens_count = tokens['1K/tokens']
     db.commit()
     db.refresh(document)
-
-    await cloud_storage.upload_file(constants.VECTOR_DB_PATH / f"{document.id}.faiss")
-    await cloud_storage.upload_file(constants.VECTOR_DB_PATH / f"{document.id}.pkl")
 
     return document
 
