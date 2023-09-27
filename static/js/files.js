@@ -117,8 +117,14 @@ btn_history.onclick = async function (e) {
         work_file.value = last_doc.name;
     }
     if (doc_id !== "") {
-        const history = await getHistory(doc_id);
-        await showHistory(history);
+        app_spinner.style.display = "inline-block";
+        try {
+            const history = await getHistory(doc_id);
+            await showHistory(history);
+        }
+        finally {
+            app_spinner.style.display = "none";
+        }
     }
 }
 
@@ -329,8 +335,14 @@ btn_summary.onclick = async function (e) {
         work_file.value = last_doc.name;
     }
     if (doc_id !== "") {
-        const summary = await getSummary(doc_id);
-        await showSummary(summary.answer)
+        app_spinner.style.display = "inline-block";
+        try {
+            const summary = await getSummary(doc_id);
+            await showSummary(summary.answer)
+        }
+        finally {
+            app_spinner.style.display = "none";
+        }
     }
 }
 
