@@ -21,8 +21,8 @@ const btn_history = document.getElementById("btn_history");
 const btn_summary = document.getElementById("btn_summary");
 const query = document.getElementById("msg_input");
 
-const send_glyph = document.getElementById("send_glyph");
-const send_spin = document.getElementById("send_spin");
+const app_spinner = document.getElementById("app_spinner");
+
 const work_file = document.getElementById("work_file");
 
 function getCurrentTime() {
@@ -54,15 +54,13 @@ btn_submit.onclick = async function (e) {
     e.preventDefault();
     if (file_id) {
         if (query.value) {
-            send_glyph.style.display = "none";
-            send_spin.style.display = "inline-block";
+            app_spinner.style.display = "inline-block";
             try {
                 createMessage(query.value, true)
                 await sendMessage(query.value, file_id)
                 query.value = ""
             } finally {
-                send_glyph.style.display = "inline-block";
-                send_spin.style.display = "none";
+                app_spinner.style.display = "none";
             }
         }
         else
