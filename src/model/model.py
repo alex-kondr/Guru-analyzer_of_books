@@ -26,7 +26,6 @@ from src.conf.config import settings
 from src.conf import constants, messages
 from src.services import cloud_storage
 
-
 EMBEDDINGS = OpenAIEmbeddings(openai_api_key=settings.openai_api_key)
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -89,6 +88,8 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
     vector_db = FAISS.from_documents(texts, EMBEDDINGS)
     vector_db.save_local(constants.VECTOR_DB_PATH, index_name=(str(document_id)))
 
+    await cloud_storage.backup_vector_db(document_id)
+
     full_text = ""
     for i in range(len(texts) - 1):
         full_text += texts[i].page_content
@@ -98,9 +99,7 @@ async def convert_document_to_vector_db(file_path: Union[str, Path], document_id
 async def load_vector_db(document_id: int):
     if (not Path(f"{constants.VECTOR_DB_PATH}/{document_id}.faiss").exists()
             or not Path(f"{constants.VECTOR_DB_PATH}/{document_id}.pkl").exists()):
-
-        await cloud_storage.download_file(f"{document_id}.faiss")
-        await cloud_storage.download_file(f"{document_id}.pkl")
+        await cloud_storage.recovery_vector_db(document_id)
 
     if (not Path(f"{constants.VECTOR_DB_PATH}/{document_id}.faiss").exists()
             or not Path(f"{constants.VECTOR_DB_PATH}/{document_id}.pkl").exists()):

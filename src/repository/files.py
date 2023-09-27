@@ -45,9 +45,6 @@ async def create_document(file: UploadFile, user_id: int, db: Session) -> Docume
 
         os.remove(file_path)
 
-        await cloud_storage.upload_file(constants.VECTOR_DB_PATH / f"{document.id}.faiss")
-        await cloud_storage.upload_file(constants.VECTOR_DB_PATH / f"{document.id}.pkl")
-
     return document
 
 
