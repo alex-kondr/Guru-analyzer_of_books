@@ -390,7 +390,7 @@ function printSummary(summary_text) {
 async function checkLimitReached() {
     const url = "/api/files/limit_reached"
     const token = localStorage.getItem('accessToken');
-    let limit_reached = null;
+    let limit_reached = true;
     const response = await fetch(url, {
         method: "GET",
         headers: {
